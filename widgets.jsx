@@ -224,7 +224,26 @@ function Performance({ onOpen }) {
   const summary = { total: 74, onTime: 47, delayed: 19, onHold: 8 };
   const statusColor = (s) => s === "on_track" ? "var(--positive)" : s === "delayed" ? "var(--negative)" : "var(--warning)";
   const statusBg   = (s) => s === "on_track" ? "var(--positive-light)" : s === "delayed" ? "var(--negative-light)" : "var(--warning-light)";
-  const [active, setActive] = React.useState(0); // dot indicator
+  const [active, setActive] = React.useState(0);
+
+  // Count-ups for summary card
+  const cuTotal    = useCountUp(summary.total, { duration: 900 });
+  const cuOnTime   = useCountUp(summary.onTime, { duration: 900, delay: 150 });
+  const cuDelayed  = useCountUp(summary.delayed, { duration: 900, delay: 250 });
+  const cuOnHold   = useCountUp(summary.onHold, { duration: 900, delay: 350 });
+
+  // Bars animate in on mount
+  const [sumBarsIn, setSumBarsIn] = React.useState(false);
+  const sumRef = React.useRef(null);
+  React.useEffect(() => {
+    const el = sumRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setTimeout(() => setSumBarsIn(true), 300); obs.disconnect(); }
+    }, { threshold: 0.4 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const Sparkline = ({ bars, target, months }) => {
     const w = 260, h = 80, padX = 4, padY = 10;
@@ -272,22 +291,89 @@ function Performance({ onOpen }) {
              setActive(i);
            }}>
 
-        {/* Summary card */}
-        <div style={{ flex: "0 0 160px", scrollSnapAlign: "start", background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 8px rgba(15,23,42,.07)", padding: "16px 14px" }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)", textTransform: "uppercase", letterSpacing: ".03em" }}>Total projects</div>
-          <div style={{ fontSize: 40, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{summary.total}</div>
-          <div style={{ height: 1, background: "var(--stroke-minimal)", margin: "14px 0 12px" }} />
+        {/* Summary card — enhanced */}
+        <div ref={sumRef} style={{
+          flex: "0 0 172px", scrollSnapAlign: "start",
+          background: "linear-gradient(145deg, #e8f3ff 0%, #f7faff 45%, #fff 100%)",
+          borderRadius: 16,
+          border: "1px solid rgba(30,100,200,.12)",
+          boxShadow: "0 2px 16px rgba(26,58,168,.08)",
+          padding: "16px 14px 18px",
+          position: "relative", overflow: "hidden"
+        }}>
+
+          {/* Decorative blur circle top-right */}
+          <div style={{ position: "absolute", top: -18, right: -18, width: 70, height: 70, borderRadius: "50%", background: "var(--reliance-base)", opacity: .07, pointerEvents: "none" }} />
+
+          {/* Label */}
+          <div style={{ fontSize: 10.5, fontWeight: 700, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".07em" }}>Total projects</div>
+
+          {/* Big number + donut */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
+            <span ref={cuTotal.ref} style={{ fontSize: 44, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", lineHeight: 1, fontVariantNumeric: "tabular-nums", animation: "summaryNumPop .55s cubic-bezier(.2,0,0,1) .15s both" }}>
+              {cuTotal.display}
+            </span>
+
+            {/* Animated conic donut */}
+            {(() => {
+              const circ = 2 * Math.PI * 16; // r=16
+              const onTimePct = summary.onTime / summary.total;
+              const delayedPct = summary.delayed / summary.total;
+              const onHoldPct = summary.onHold / summary.total;
+              const seg1 = onTimePct * circ;
+              const seg2 = delayedPct * circ;
+              const seg3 = onHoldPct * circ;
+              return (
+                <svg width="44" height="44" viewBox="0 0 44 44" style={{ flexShrink: 0, animation: "donutSpin .7s cubic-bezier(.2,0,0,1) .2s both" }}>
+                  {/* BG ring */}
+                  <circle cx="22" cy="22" r="16" fill="none" stroke="var(--stroke-minimal)" strokeWidth="5.5" />
+                  {/* On time - green */}
+                  <circle cx="22" cy="22" r="16" fill="none" stroke="var(--positive)" strokeWidth="5.5"
+                    strokeDasharray={`${seg1 - .5} ${circ}`}
+                    strokeDashoffset={circ * .25}
+                    style={{ transition: "stroke-dasharray .9s cubic-bezier(.4,0,.2,1) .4s" }}
+                  />
+                  {/* Delayed - red */}
+                  <circle cx="22" cy="22" r="16" fill="none" stroke="var(--negative)" strokeWidth="5.5"
+                    strokeDasharray={`${seg2 - .5} ${circ}`}
+                    strokeDashoffset={circ * .25 - seg1}
+                    style={{ transition: "stroke-dasharray .8s cubic-bezier(.4,0,.2,1) .6s" }}
+                  />
+                  {/* On hold - gray */}
+                  <circle cx="22" cy="22" r="16" fill="none" stroke="var(--content-minimal)" strokeWidth="5.5"
+                    strokeDasharray={`${seg3 - .5} ${circ}`}
+                    strokeDashoffset={circ * .25 - seg1 - seg2}
+                  />
+                </svg>
+              );
+            })()}
+          </div>
+
+          {/* Divider */}
+          <div style={{ height: 1, background: "rgba(30,100,200,.1)", margin: "13px 0 11px" }} />
+
+          {/* Stats with animated bars */}
           {[
-            { label: "On time", val: summary.onTime, color: "var(--positive)" },
-            { label: "Delayed", val: summary.delayed, color: "var(--negative)" },
-            { label: "On hold", val: summary.onHold, color: "var(--content-minimal)" }
-          ].map(s => (
-            <div key={s.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ width: 7, height: 7, borderRadius: 999, background: s.color, flexShrink: 0 }} />
-                <span style={{ fontSize: 12.5, fontWeight: 600, color: "var(--content-moderate)" }}>{s.label}</span>
+            { label: "On time", cu: cuOnTime, color: "var(--positive)", frac: summary.onTime / summary.total, delay: 0 },
+            { label: "Delayed", cu: cuDelayed, color: "var(--negative)", frac: summary.delayed / summary.total, delay: 110 },
+            { label: "On hold", cu: cuOnHold, color: "var(--content-minimal)", frac: summary.onHold / summary.total, delay: 220 }
+          ].map((s, i) => (
+            <div key={s.label} style={{ marginBottom: i < 2 ? 11 : 0, animation: `fadeIn .4s ease ${.35 + i * .1}s both` }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: 999, background: s.color, flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)" }}>{s.label}</span>
+                </div>
+                <span ref={s.cu.ref} style={{ fontSize: 15, fontWeight: 800, color: s.color, fontVariantNumeric: "tabular-nums" }}>{s.cu.display}</span>
               </div>
-              <span style={{ fontSize: 15, fontWeight: 800, color: s.color, fontVariantNumeric: "tabular-nums" }}>{s.val}</span>
+              {/* Mini progress bar */}
+              <div style={{ height: 4, borderRadius: 999, background: "rgba(30,100,200,.08)", overflow: "hidden" }}>
+                <div style={{
+                  height: "100%", borderRadius: 999, background: s.color,
+                  width: sumBarsIn ? `${s.frac * 100}%` : "0%",
+                  transition: `width .8s cubic-bezier(.4,0,.2,1) ${s.delay}ms`
+                }} />
+              </div>
             </div>
           ))}
         </div>
