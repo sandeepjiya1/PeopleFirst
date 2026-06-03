@@ -8,6 +8,7 @@ import '../../../../providers/employee/tasks_provider.dart';
 import '../../../../providers/toast_provider.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/pf_card.dart';
+import '../../../../shared/widgets/widget_entrance.dart';
 
 class TasksWidget extends ConsumerWidget {
   const TasksWidget({super.key});
@@ -48,7 +49,10 @@ class TasksWidget extends ConsumerWidget {
                     final task = todayTasks[i];
                     return Column(
                       children: [
-                        _TaskRow(task: task),
+                        WidgetEntrance(
+                          index: i,
+                          child: _TaskRow(task: task),
+                        ),
                         if (i < todayTasks.length - 1)
                           const Divider(height: 1, indent: 48, endIndent: 16),
                       ],

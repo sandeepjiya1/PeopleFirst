@@ -1,0 +1,414 @@
+/* global React, Icon, ColorIcon, Button, Card, Signal, Dot, Widget, Stat, Trend */
+const { useState } = React;
+
+// ═══════════════════════════════════════════════════════════════
+// 1 · AI MORNING BRIEFING — the chief of staff
+// ═══════════════════════════════════════════════════════════════
+function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant }) {
+  const handled = [
+  { cat: "Approvals", n: 14, note: "auto-approved within policy" },
+  { cat: "Expenses", n: 9, note: "matched to receipts & cleared" },
+  { cat: "Calendar", n: 6, note: "conflicts resolved, 2 declined" },
+  { cat: "Pipeline", n: 5, note: "stale candidates nudged" },
+  { cat: "Alerts", n: 3, note: "deprioritised as low-signal" }];
+
+  return (
+    <div style={{
+      borderRadius: 20, overflow: "hidden",
+      border: "1px solid var(--sky-border)",
+      boxShadow: "0 1px 3px rgba(15,23,42,.05), 0 8px 24px -12px var(--sky-shadow)",
+      background: "var(--surface-minimal)"
+    }}>
+      {/* Sky header band */}
+      <div style={{ background: "linear-gradient(180deg, var(--sky-light) 0%, color-mix(in oklch, var(--sky-light) 55%, white) 100%)", padding: "15px 16px 14px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+          <span style={{
+            width: 30, height: 30, borderRadius: 9, background: "var(--sky)", display: "flex",
+            alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px -1px var(--sky-shadow)"
+          }}>
+            <Icon name="ai_sparkle" size={19} color="#fff" />
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--sky-ink)", letterSpacing: "-.01em" }}>PeopleFirst AI</div>
+            <div style={{ fontSize: 11.5, color: "var(--sky-ink)", opacity: .7, fontWeight: 500, marginTop: -1 }}>Overnight brief · updated 8:47am</div>
+          </div>
+          <button onClick={onOpenAssistant} aria-label="Ask AI" style={{
+            width: 32, height: 32, borderRadius: 999, border: "1px solid var(--sky-border)", background: "rgba(255,255,255,.7)",
+            display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer"
+          }}>
+            <Icon name="send_message" size={16} color="var(--sky)" />
+          </button>
+        </div>
+        <p style={{ margin: "13px 2px 2px", fontSize: 17, fontWeight: 700, lineHeight: 1.32, color: "var(--content-heavy)", letterSpacing: "-.01em", textWrap: "pretty", width: "341px" }}>
+          I scanned 6 systems overnight. <span style={{ color: "var(--sky-ink)" }}>37 items handled.</span> {decisions.length} need your decision today.
+        </p>
+      </div>
+
+      {/* Decisions that need a human */}
+      <div style={{ padding: "6px 12px 12px" }}>
+        {decisions.map((d, i) =>
+        <div key={d.id} style={{
+          display: "flex", gap: 11, padding: "13px 6px 14px",
+          borderTop: i ? "1px solid var(--stroke-minimal)" : "none"
+        }}>
+            <span style={{ marginTop: 2, flexShrink: 0 }}><Dot tone={d.tone} size={9} /></span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.3, letterSpacing: "-.01em" }}>{d.title}</div>
+              <div style={{ fontSize: 13, color: "var(--content-moderate)", lineHeight: 1.42, marginTop: 3, textWrap: "pretty", whiteSpace: "pre-line" }}>{d.detail}</div>
+              <div style={{ display: "flex", gap: 8, marginTop: 11 }}>
+                <Button size="s" variant={d.cta.variant || "primary"} onClick={() => onResolve(d.id, "primary")}>{d.cta.label}</Button>
+                <Button size="s" variant="secondary" onClick={() => onResolve(d.id, "review")}>{d.secondary || "Review"}</Button>
+              </div>
+            </div>
+          </div>
+        )}
+        {decisions.length === 0 &&
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "16px 8px" }}>
+            <ColorIcon name="success_colored" size={26} />
+            <div>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)" }}>You're clear for the review.</div>
+              <div style={{ fontSize: 13, color: "var(--content-moderate)", marginTop: 1 }}>Nothing else needs you before 10am.</div>
+            </div>
+          </div>
+        }
+      </div>
+
+      {/* Handled — expandable */}
+      <button onClick={onToggle} style={{
+        width: "100%", border: "none", borderTop: "1px solid var(--stroke-minimal)",
+        background: "var(--surface-subtle)", padding: "12px 16px", cursor: "pointer", fontFamily: "inherit",
+        display: "flex", alignItems: "center", gap: 8
+      }}>
+        <Icon name="check" size={16} color="var(--positive)" />
+        <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", flex: 1, textAlign: "left" }}>AI handled overnight · 37
+
+        </span>
+        <Icon name={expanded ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" />
+      </button>
+      {expanded &&
+      <div style={{ background: "var(--surface-subtle)", padding: "0 16px 14px" }}>
+          {handled.map((h) =>
+        <div key={h.cat} style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "8px 0", borderTop: "1px solid var(--stroke-minimal)" }}>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", width: 78, flexShrink: 0 }}>{h.cat}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 800, color: "var(--sky-ink)", fontVariantNumeric: "tabular-nums" }}>{h.n}</span>
+              <span style={{ fontSize: 12.5, color: "var(--content-moderate)", flex: 1, textWrap: "pretty" }}>{h.note}</span>
+            </div>
+        )}
+        </div>
+      }
+    </div>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2 · PERFORMANCE — honest read of the month
+// ═══════════════════════════════════════════════════════════════
+function Performance({ onOpen }) {
+  const bars = [62, 70, 66, 74, 80, 86]; // last 6 weeks
+  const subs = [
+  { label: "Sprint velocity", value: "92 pts", tone: "healthy" },
+  { label: "Escaped defects", value: "14 this mo", tone: "risk" },
+  { label: "Capacity load", value: "113%", tone: "off" }];
+
+  return (
+    <Widget icon="analytics" title="Performance" action="Reports" onAction={onOpen} accent="var(--content-minimal)">
+      <Card surface="elev" pad={16}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>On-time delivery · May</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 9, marginTop: 6 }}>
+              <span style={{ fontSize: 38, fontWeight: 900, lineHeight: .9, letterSpacing: "-.03em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>86%</span>
+              <Trend dir="up">+4 pts</Trend>
+            </div>
+          </div>
+          {/* sparkline */}
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 46 }}>
+            {bars.map((b, i) =>
+            <span key={i} style={{
+              width: 7, height: `${b}%`, borderRadius: 3,
+              background: i === bars.length - 1 ? "var(--reliance-base)" : "var(--reliance-100)"
+            }} />
+            )}
+          </div>
+        </div>
+        <div style={{ marginTop: 14, borderTop: "1px solid var(--stroke-minimal)" }}>
+          {subs.map((s) =>
+          <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 0 0" }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-heavy)", flex: 1 }}>{s.label}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-moderate)", fontVariantNumeric: "tabular-nums" }}>{s.value}</span>
+              <Signal tone={s.tone} />
+            </div>
+          )}
+        </div>
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 3 · ACTION ITEMS — approvals, with AI bulk-approve
+// ═══════════════════════════════════════════════════════════════
+function ActionItems({ state, onBulkApprove, onOpen }) {
+  // state: { total, lowRisk, approved }
+  const types = [
+  { label: "Leave", n: 12, icon: "calendar" },
+  { label: "Travel", n: 6, icon: "location" },
+  { label: "Expense", n: 3, icon: "card" },
+  { label: "Sign-offs", n: 2, icon: "document" }];
+
+  const remaining = state.total - state.approved;
+  return (
+    <Widget icon="confirm" title="Action items" action="All approvals" onAction={onOpen}>
+      <Card surface="elev" pad={16}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          <span style={{ fontSize: 30, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{remaining}</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-moderate)" }}>waiting on you</span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 7, marginTop: 13 }}>
+          {types.map((t) =>
+          <div key={t.label} style={{ background: "var(--surface-subtle)", borderRadius: 12, padding: "10px 6px 9px", textAlign: "center" }}>
+              <Icon name={t.icon} size={17} color="var(--content-minimal)" style={{ margin: "0 auto" }} />
+              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--content-heavy)", marginTop: 5, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{t.n}</div>
+              <div style={{ fontSize: 11, color: "var(--content-minimal)", fontWeight: 600, marginTop: 1 }}>{t.label}</div>
+            </div>
+          )}
+        </div>
+
+        {state.approved === 0 ?
+        <div style={{ marginTop: 13, padding: "12px 13px", borderRadius: 12, background: "var(--sky-light)", display: "flex", alignItems: "center", gap: 11 }}>
+            <Icon name="ai_sparkle" size={18} color="var(--sky)" />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--sky-ink)", lineHeight: 1.3 }}>{state.lowRisk} are low-risk and within policy.</div>
+              <div style={{ fontSize: 12, color: "var(--sky-ink)", opacity: .72, marginTop: 1 }}>Routine leave & expenses under ₹10,000.</div>
+            </div>
+          </div> :
+
+        <div style={{ marginTop: 13, padding: "12px 13px", borderRadius: 12, background: "var(--positive-light)", display: "flex", alignItems: "center", gap: 11 }}>
+            <Icon name="confirm" size={18} color="var(--positive)" />
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--positive)", lineHeight: 1.3 }}>{state.approved} approved by AI on your say-so.</div>
+          </div>
+        }
+
+        {state.approved === 0 &&
+        <Button variant="sky" size="m" full style={{ marginTop: 11 }} icon="ai_sparkle" onClick={onBulkApprove}>
+            Auto-approve {state.lowRisk} low-risk
+          </Button>
+        }
+        {remaining > 0 &&
+        <button onClick={onOpen} style={{
+          width: "100%", marginTop: 9, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
+          fontSize: 13.5, fontWeight: 700, color: "var(--reliance-base)"
+        }}>Review remaining {remaining} myself</button>
+        }
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 4 · TEAM SNAPSHOT — four numbers
+// ═══════════════════════════════════════════════════════════════
+function TeamSnapshot({ onOpen }) {
+  const total = 250,present = 214,leave = 22,notIn = 14;
+  const cells = [
+  { label: "Headcount", value: total, tone: "neutral" },
+  { label: "Present", value: present, tone: "healthy" },
+  { label: "On leave", value: leave, tone: "info" },
+  { label: "Not in", value: notIn, tone: "risk" }];
+
+  const toneColor = { neutral: "var(--content-heavy)", healthy: "var(--positive)", info: "var(--sky)", risk: "var(--warning)" };
+  return (
+    <Widget icon="group" title="Team today" action="Team" onAction={onOpen}>
+      <Card surface="elev" pad={16}>
+        {/* presence bar */}
+        <div style={{ display: "flex", height: 8, borderRadius: 999, overflow: "hidden", gap: 2, marginBottom: 14 }}>
+          <span style={{ flex: present, background: "var(--positive)" }} />
+          <span style={{ flex: leave, background: "var(--sky)" }} />
+          <span style={{ flex: notIn, background: "var(--warning)" }} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
+          {cells.map((c, i) =>
+          <div key={c.label} style={{ textAlign: "center", borderLeft: i ? "1px solid var(--stroke-minimal)" : "none" }}>
+              <div style={{ fontSize: 24, fontWeight: 900, color: toneColor[c.tone], fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{c.value}</div>
+              <div style={{ fontSize: 11.5, color: "var(--content-moderate)", fontWeight: 600, marginTop: 5 }}>{c.label}</div>
+            </div>
+          )}
+        </div>
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 5 · RECRUITMENT — pipeline health
+// ═══════════════════════════════════════════════════════════════
+function Recruitment({ onOpen }) {
+  const roles = [
+  { title: "Sr. Backend Engineer", note: "4 in final round", tone: "healthy" },
+  { title: "EM, Platform", note: "Stalled 9 days · no movement", tone: "risk" },
+  { title: "Product Designer", note: "71 days open · 0 in pipeline", tone: "off" }];
+
+  return (
+    <Widget
+      icon="id" title="Recruitment" action="All 8 roles" onAction={onOpen}
+      right={<span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--negative)", display: "inline-flex", alignItems: "center", gap: 5, marginRight: 10 }}><Dot tone="off" size={7} />1 critical</span>}>
+      
+      <Card surface="elev" pad={4}>
+        {roles.map((r, i) =>
+        <div key={r.title} style={{
+          display: "flex", alignItems: "center", gap: 11, padding: "12px 12px",
+          borderTop: i ? "1px solid var(--stroke-minimal)" : "none"
+        }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.title}</div>
+              <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{r.note}</div>
+            </div>
+            <Signal tone={r.tone} />
+          </div>
+        )}
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 6 · UPCOMING BOOKINGS — next 2 weighty events
+// ═══════════════════════════════════════════════════════════════
+function Bookings({ onOpen }) {
+  const events = [
+  { time: "10:00", day: "Today", title: "Q2 Leadership Review", sub: "You present · 6 attendees", soon: "in 1h 8m" },
+  { time: "09:00", day: "Mon", title: "Board readout", sub: "Boardroom A · prep deck shared", soon: null }];
+
+  return (
+    <Widget icon="calendar" title="Upcoming" action="Calendar" onAction={onOpen}>
+      <Card surface="elev" pad={4}>
+        {events.map((e, i) =>
+        <div key={e.title} style={{
+          display: "flex", alignItems: "center", gap: 13, padding: "13px 13px",
+          borderTop: i ? "1px solid var(--stroke-minimal)" : "none"
+        }}>
+            <div style={{
+            width: 54, flexShrink: 0, textAlign: "center", padding: "8px 0", borderRadius: 11,
+            background: i === 0 ? "var(--reliance-base)" : "var(--surface-subtle)",
+            color: i === 0 ? "#fff" : "var(--content-heavy)"
+          }}>
+              <div style={{ fontSize: 16, fontWeight: 900, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{e.time}</div>
+              <div style={{ fontSize: 10.5, fontWeight: 700, opacity: i === 0 ? .85 : .6, marginTop: 1 }}>{e.day}</div>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em" }}>{e.title}</div>
+              <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{e.sub}</div>
+            </div>
+            {e.soon && <Signal tone="info" dot={false}>{e.soon}</Signal>}
+          </div>
+        )}
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 7 · NEWS & UPDATES — a trusted colleague's morning note
+// ═══════════════════════════════════════════════════════════════
+function News({ onOpen }) {
+  const items = [
+  { tag: "Policy", tone: "var(--warning)", title: "Hybrid work policy goes live Monday", body: "Affects your 3 remote pods — 2 need a desk plan." },
+  { tag: "Win", tone: "var(--positive)", title: "Platform cut p95 latency 40%", body: "Worth a shout-out in today's review." },
+  { tag: "People", tone: "var(--sky)", title: "Aanya returns from leave today", body: "Back on the Design team after 4 months." }];
+
+  return (
+    <Widget icon="flag" title="Worth knowing" action="All updates" onAction={onOpen}>
+      <Card surface="elev" pad={4}>
+        {items.map((n, i) =>
+        <div key={n.title} style={{ display: "flex", gap: 11, padding: "13px 13px", borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
+            <span style={{ width: 8, height: 8, borderRadius: 999, background: n.tone, flexShrink: 0, marginTop: 5 }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: n.tone, textTransform: "uppercase", letterSpacing: ".04em" }}>{n.tag}</div>
+              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", marginTop: 2, letterSpacing: "-.01em", lineHeight: 1.3 }}>{n.title}</div>
+              <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, lineHeight: 1.4, textWrap: "pretty" }}>{n.body}</div>
+            </div>
+          </div>
+        )}
+      </Card>
+    </Widget>);
+
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPENSE & BUDGET (leader only) — real-time spend vs plan
+// All figures reconcile: categories sum to total; travel split sums to travel.
+// ═══════════════════════════════════════════════════════════════
+function ExpenseBudget({ onOpen }) {
+  const pct = 83,pace = 79; // spent ₹86L of ₹104L plan; expected pace 79%
+  // Travel ₹35L → Domestic ₹17.1L (49%) + International ₹17.9L (51%) = ₹35.0L
+  const domPct = 49,intlPct = 51;
+  const cats = [
+  { label: "Team travel", value: "₹35L", tone: "risk", note: "+8% vs plan" },
+  { label: "Contractors", value: "₹24L", tone: "healthy", note: "Under plan" },
+  { label: "Tooling & SaaS", value: "₹17L", tone: "healthy", note: "On plan" },
+  { label: "Training & events", value: "₹10L", tone: "off", note: "+15% vs plan" }];
+
+  const noteColor = (t) => t === "healthy" ? "var(--positive)" : t === "risk" ? "var(--warning)" : "var(--negative)";
+
+  return (
+    <Widget title="Expense & budget" action="Breakdown" onAction={onOpen}>
+      <Card surface="elev" pad={16}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Q2 spend vs plan</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 6 }}>
+              <span style={{ fontSize: 32, fontWeight: 900, lineHeight: .9, letterSpacing: "-.03em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>₹86L</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-minimal)" }}>of ₹1.04 Cr</span>
+            </div>
+          </div>
+        </div>
+        <div style={{ height: 8, borderRadius: 999, background: "var(--surface-subtle)", marginTop: 13, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: "var(--reliance-base)" }} />
+        </div>
+        <div style={{ position: "relative", height: 14, marginTop: 3 }}>
+          <span style={{ position: "absolute", left: `${pace}%`, transform: "translateX(-50%)", fontSize: 10.5, fontWeight: 700, color: "var(--content-minimal)", whiteSpace: "nowrap" }}>Pace {pace}%</span>
+        </div>
+
+        {/* Verdict bar — anchored inside the card, below the progress bar, above the breakdown */}
+        <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 8, padding: "10px 12px", borderRadius: 12, background: "var(--warning-light)" }}>
+          <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--warning)", flexShrink: 0 }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.35 }}>
+            {pct - pace}% over pace · <span style={{ color: "var(--warning)" }}>team travel is the main driver</span>
+          </span>
+        </div>
+
+        <div style={{ marginTop: 4 }}>
+          {cats.map((c) =>
+          <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 0 0" }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-heavy)", flex: 1 }}>{c.label}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-moderate)", fontVariantNumeric: "tabular-nums" }}>{c.value}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: noteColor(c.tone), width: 92, textAlign: "right" }}>{c.note}</span>
+            </div>
+          )}
+        </div>
+
+        <div style={{ marginTop: 14, padding: "12px 13px", borderRadius: 12, background: "var(--surface-subtle)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--content-heavy)" }}>Team travel · ₹35L</span>
+          </div>
+          <div style={{ display: "flex", height: 8, borderRadius: 999, overflow: "hidden", gap: 2, marginTop: 10 }}>
+            <span style={{ flex: domPct, background: "var(--positive)" }} />
+            <span style={{ flex: intlPct, background: "var(--reliance-base)" }} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginTop: 9 }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--content-moderate)", fontWeight: 600, whiteSpace: "nowrap" }}>
+              <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--positive)", flexShrink: 0 }} />{`Domestic ${domPct}% · ₹17.1L`}
+            </span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--content-moderate)", fontWeight: 600, whiteSpace: "nowrap" }}>
+              <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--reliance-base)", flexShrink: 0 }} />{`Intl ${intlPct}% · ₹17.9L`}
+            </span>
+          </div>
+        </div>
+      </Card>
+    </Widget>);
+
+}
+
+Object.assign(window, {
+  AIBriefing, Performance, ExpenseBudget, ActionItems, TeamSnapshot, Recruitment, Bookings, News
+});

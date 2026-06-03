@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PeopleFirst — Leader</title>
+<style>
+/* ── JioType (JDS 2.0 — CDN) ─────────────────────────── */
+@font-face {
+  font-family: 'JioType';
+  src: url('https://raw.githubusercontent.com/Anand1bhatt/my-jds-mcp/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2');
+  font-weight: 400; font-display: swap;
+}
+@font-face {
+  font-family: 'JioType';
+  src: url('https://raw.githubusercontent.com/Anand1bhatt/my-jds-mcp/main/assets/fonts/woff2/JioTypeW05-Medium.woff2') format('woff2');
+  font-weight: 500; font-display: swap;
+}
+@font-face {
+  font-family: 'JioType';
+  src: url('https://raw.githubusercontent.com/Anand1bhatt/my-jds-mcp/main/assets/fonts/woff2/JioTypeW05-Bold.woff2') format('woff2');
+  font-weight: 700; font-display: swap;
+}
+@font-face {
+  font-family: 'JioType';
+  src: url('https://raw.githubusercontent.com/Anand1bhatt/my-jds-mcp/main/assets/fonts/woff2/JioTypeW05-Black.woff2') format('woff2');
+  font-weight: 900; font-display: swap;
+}
+
+/* ── JDS 2.0 Design Tokens (DesignXMCP verified) ──────── */
+:root {
+  /* Colors */
+  --primary-20: #e8e8fc;
+  --primary-30: #9999ff;
+  --primary-40: #6464ff;
+  --primary-50: #3535f3;
+  --primary-60: #000093;
+  --primary-70: #00004c;
+  --secondary-50: #f7ab20;
+  --sparkle-20: #e8faf7;
+  --sparkle-50: #1eccb0;
+  --sparkle-60: #1e7b74;
+  --error:   #fa2f40;
+  --warning: #f06d0f;
+  --success: #25ab21;
+  --grey-100: #141414;
+  --grey-80:  rgba(0,0,0,0.66);
+  --grey-60:  #b5b5b5;
+  --grey-40:  #e0e0e0;
+  --grey-20:  #f5f5f5;
+  /* Semantic */
+  --surface-default:  #ffffff;
+  --surface-minimal:  #f5f5f5;
+  --surface-ghost:    #eeeeef;
+  --surface-ghost-icon: #e7e9ff;
+  --text-high:        #141414;
+  --text-low:         rgba(25,27,30,0.65);
+  --text-disabled:    rgba(25,27,30,0.38);
+  --text-on-bold:     #ffffff;
+  --stroke-subtle:    rgba(36,38,43,0.12);
+
+  /* Typography (JDS scale) */
+  --ff: 'JioType', system-ui, sans-serif;
+  --fw-n: 400; --fw-m: 500; --fw-b: 700; --fw-k: 900;
+  --t-overline: 10px;    /* Bold UPPERCASE letter-spacing */
+  --t-label-4xs: 8px;
+  --t-label-3xs: 9px;
+  --t-label-2xs: 10px;
+  --t-label-xs:  11px;
+  --t-label-s:   12px;
+  --t-label-m:   13px;
+  --t-label-l:   14px;
+  --t-body-2xs:  12px;
+  --t-body-xs:   13px;
+  --t-body-s:    14px;
+  --t-body-l:    16px;
+  --t-title-s:   16px;
+  --t-title-m:   18px;
+  --t-headline-s: 24px;
+  --t-button: 14px;
+
+  /* Spacing */
+  --sp-3xs: 4px;  --sp-2xs: 6px;   --sp-xs: 8px;
+  --sp-s: 12px;   --sp-m: 16px;    --sp-l: 20px;
+  --sp-xl: 24px;  --sp-2xl: 32px;  --sp-3xl: 40px;
+  --sp-4xl: 48px; --sp-huge: 64px; --sp-massive: 80px;
+
+  /* Radius */
+  --r-xs: 4px;  --r-s: 8px;  --r-m: 12px;
+  --r-l: 16px;  --r-xl: 24px; --r-pill: 999px;
+
+  /* Shadows */
+  --shadow-s: 0 1px 4px rgba(0,0,0,0.08);
+  --shadow-m: 0 4px 16px rgba(0,0,0,0.12);
+
+  /* Opacity */
+  --op-disabled: 0.38;
+  --op-btn-disabled: 0.3; /* buttons only */
+}
+
+/* ── Base reset ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: var(--ff);
+  background: var(--surface-minimal);
+  color: var(--text-high);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── App shell ───────────────────────────────────────── */
+.app {
+  max-width: 430px; margin: 0 auto;
+  height: 100dvh; display: flex; flex-direction: column;
+  background: var(--surface-minimal); overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────────
+   JDS HEADER
+───────────────────────────────────────────────────── */
+.header {
+  background: var(--surface-default);
+  padding: var(--sp-s) var(--sp-m);
+  display: flex; align-items: center; gap: var(--sp-s);
+  border-bottom: 1px solid var(--stroke-subtle);
+  flex-shrink: 0; z-index: 100;
+}
+/* JDS Avatar — primary-50 bg, text-on-bold text */
+.jds-avatar {
+  width: 40px; height: 40px; border-radius: var(--r-pill);
+  background: var(--primary-50);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-on-bold);
+  font-family: var(--ff); font-weight: var(--fw-k); font-size: 15px;
+  flex-shrink: 0;
+}
+.hd-greet { flex: 1; }
+.hd-sub {
+  font-size: var(--t-body-2xs); font-weight: var(--fw-n);
+  color: var(--text-low); line-height: 1.2;
+}
+.hd-name {
+  font-size: var(--t-title-s); font-weight: var(--fw-b);
+  color: var(--text-high); line-height: 1.2;
+}
+.hd-actions { display: flex; gap: var(--sp-xs); }
+/* JDS Tertiary icon button — 40×40, transparent bg */
+.icon-btn {
+  width: 40px; height: 40px; border-radius: var(--r-pill);
+  border: none; background: var(--surface-minimal);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; color: var(--text-high);
+}
+.icon-btn:active { background: var(--grey-40); }
+.icon-btn svg { width: 20px; height: 20px; fill: currentColor; }
+.notif-wrap { position: relative; }
+/* JDS Badge — Notification Dot (error-50, 8px, pill) */
+.jds-notif-dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 8px; height: 8px; border-radius: var(--r-pill);
+  background: var(--error);
+  border: 2px solid var(--surface-default);
+}
+
+/* ── Scroll area ─────────────────────────────────────── */
+.scroll {
+  flex: 1; overflow-y: auto;
+  padding: var(--sp-m) var(--sp-m) 88px;
+  display: flex; flex-direction: column; gap: var(--sp-m);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ── JDS Card shell ──────────────────────────────────── */
+.card {
+  background: var(--surface-default);
+  border-radius: var(--r-l); padding: var(--sp-m);
+  box-shadow: var(--shadow-s);
+}
+
+/* ── JDS Section overline label ──────────────────────── */
+.sec-head {
+  display: flex; align-items: center; gap: var(--sp-xs);
+  margin-bottom: var(--sp-s);
+}
+.sec-lbl {
+  font-family: var(--ff);
+  font-size: var(--t-overline); font-weight: var(--fw-b);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-low);
+}
+/* JDS AI chip — uses IcBrain icon + primary-50 gradient bg */
+.ai-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px var(--sp-xs); border-radius: var(--r-pill);
+  background: linear-gradient(135deg, var(--primary-50), var(--sparkle-50));
+  color: var(--text-on-bold);
+  font-family: var(--ff); font-size: var(--t-label-2xs); font-weight: var(--fw-b);
+}
+.ai-chip svg { width: 10px; height: 10px; fill: var(--text-on-bold); }
+/* JDS Tertiary link button */
+.view-all {
+  margin-left: auto; font-family: var(--ff);
+  font-size: var(--t-body-2xs); font-weight: var(--fw-m);
+  color: var(--primary-50); background: none; border: none; cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────────────
+   1. AI MORNING BRIEFING
+   JDS: dark surface card (surface-bold tint) + pulse dot
+───────────────────────────────────────────────────── */
+.briefing {
+  background: linear-gradient(140deg, #0d0d2e 0%, #1a1a4e 55%, #061a1a 100%);
+  border-radius: var(--r-l); padding: var(--sp-m);
+  position: relative; overflow: hidden;
+}
+/* ambient glow using primary-50 + sparkle-50 at low opacity */
+.briefing::before {
+  content: ''; position: absolute; top: -50px; right: -50px;
+  width: 180px; height: 180px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(53,53,243,0.22) 0%, transparent 70%);
+}
+.briefing::after {
+  content: ''; position: absolute; bottom: -30px; left: -20px;
+  width: 120px; height: 120px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(30,204,176,0.16) 0%, transparent 70%);
+}
+.bf-top {
+  display: flex; align-items: center; gap: var(--sp-xs);
+  margin-bottom: var(--sp-s); position: relative; z-index: 1;
+}
+/* JDS status dot — sparkle-50, pulse animation */
+.pulse-dot {
+  width: 8px; height: 8px; border-radius: var(--r-pill);
+  background: var(--sparkle-50);
+  animation: bfpulse 2s ease-in-out infinite;
+}
+@keyframes bfpulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.45;transform:scale(1.5)} }
+.bf-title {
+  font-family: var(--ff); font-size: var(--t-label-l); font-weight: var(--fw-b);
+  color: rgba(255,255,255,0.92);
+}
+.bf-count {
+  margin-left: auto; font-family: var(--ff);
+  font-size: var(--t-label-s); font-weight: var(--fw-n);
+  color: rgba(255,255,255,0.5);
+}
+.bf-cards {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: var(--sp-xs);
+  position: relative; z-index: 1;
+}
+.bf-card {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: var(--r-m); padding: var(--sp-xs) var(--sp-s);
+  cursor: pointer; transition: background .15s;
+}
+.bf-card:active { background: rgba(255,255,255,0.14); }
+/* JDS icon circle on dark surface */
+.bf-ic {
+  width: 28px; height: 28px; border-radius: var(--r-xs);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: var(--sp-3xs);
+}
+.bf-ic svg { width: 14px; height: 14px; fill: currentColor; }
+.bf-ic.r { background: rgba(250,47,64,0.18); color: #ff7b85; }
+.bf-ic.a { background: rgba(247,171,32,0.18); color: var(--secondary-50); }
+.bf-ic.g { background: rgba(37,171,33,0.18); color: #5ed95a; }
+.bf-card-ttl {
+  font-family: var(--ff); font-size: var(--t-label-m); font-weight: var(--fw-b);
+  color: rgba(255,255,255,0.90); line-height: 1.2; margin-bottom: 2px;
+}
+.bf-meta {
+  font-family: var(--ff); font-size: var(--t-label-3xs); font-weight: var(--fw-n);
+  color: rgba(255,255,255,0.5); margin-bottom: var(--sp-3xs);
+}
+/* JDS Status Badge — subtle on dark */
+.bf-badge {
+  display: inline-block; padding: 2px 7px; border-radius: var(--r-pill);
+  font-family: var(--ff); font-size: var(--t-label-3xs); font-weight: var(--fw-b);
+}
+.bf-badge.r { background: rgba(250,47,64,0.22); color: #ff7b85; }
+.bf-badge.a { background: rgba(247,171,32,0.22); color: var(--secondary-50); }
+.bf-badge.g { background: rgba(37,171,33,0.22); color: #5ed95a; }
+
+/* ─────────────────────────────────────────────────────
+   2. PERFORMANCE ✦ AI
+───────────────────────────────────────────────────── */
+/* JDS surface-ghost-icon tinted block */
+.kpi-hero {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-m); border-radius: var(--r-m);
+  background: linear-gradient(135deg, #f0f4ff, #e6f8f5);
+  border: 1px solid var(--stroke-subtle); margin-bottom: var(--sp-s);
+}
+.kpi-hero-l .kt { font-family: var(--ff); font-size: var(--t-body-2xs); font-weight: var(--fw-m); color: var(--text-low); margin-bottom: 4px; }
+.kpi-hero-l .kv { font-family: var(--ff); font-size: 28px; font-weight: var(--fw-k); color: var(--text-high); line-height: 1; letter-spacing: -0.03em; }
+.kpi-hero-l .kd { font-family: var(--ff); font-size: var(--t-body-2xs); font-weight: var(--fw-m); color: var(--success); margin-top: 3px; }
+/* Donut chart */
+.donut { width: 64px; height: 64px; position: relative; flex-shrink: 0; }
+.donut svg { transform: rotate(-90deg); }
+.donut-n {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff); font-size: var(--t-label-m); font-weight: var(--fw-k); color: var(--primary-50);
+}
+/* Sub-KPI grid */
+.kpi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--sp-xs); }
+.kpi-sub {
+  background: var(--surface-minimal); border-radius: var(--r-m);
+  border: 1px solid var(--stroke-subtle); padding: var(--sp-xs) var(--sp-s); text-align: center;
+}
+.ks-tag { font-family: var(--ff); font-size: 9px; font-weight: var(--fw-m); color: var(--text-low); line-height: 1.3; margin-bottom: 4px; }
+.ks-val { font-family: var(--ff); font-size: 15px; font-weight: var(--fw-k); line-height: 1; margin-bottom: 3px; }
+/* JDS Status Badge — subtle emphasis */
+.sbadge {
+  display: inline-block; padding: 1px 7px; border-radius: var(--r-pill);
+  font-family: var(--ff); font-size: var(--t-label-3xs); font-weight: var(--fw-b);
+}
+.sb-r { background: rgba(250,47,64,0.10); color: var(--error); }
+.sb-g { background: rgba(37,171,33,0.10); color: var(--success); }
+.sb-w { background: rgba(240,109,15,0.10); color: var(--warning); }
+
+/* ─────────────────────────────────────────────────────
+   3. ACTION ITEMS ✦ AI
+───────────────────────────────────────────────────── */
+/* JDS Primary button gradient banner */
+.action-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-s) var(--sp-m); border-radius: var(--r-m);
+  background: linear-gradient(135deg, var(--primary-50), var(--sparkle-50));
+  margin-bottom: var(--sp-s); cursor: pointer; gap: var(--sp-xs);
+}
+.ab-txt .at { font-family: var(--ff); font-size: var(--t-label-l); font-weight: var(--fw-b); color: var(--text-on-bold); }
+.ab-txt .as { font-family: var(--ff); font-size: var(--t-label-xs); font-weight: var(--fw-n); color: rgba(255,255,255,0.78); margin-top: 2px; }
+/* JDS Button — Primary Inverse (white on primary bg) */
+.btn-inv {
+  padding: 0 var(--sp-m); height: 36px; border-radius: var(--r-pill);
+  background: rgba(255,255,255,0.20); border: 1px solid rgba(255,255,255,0.35);
+  color: var(--text-on-bold); font-family: var(--ff);
+  font-size: var(--t-button); font-weight: var(--fw-b);
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+.btn-inv:active { opacity: var(--op-btn-disabled); }
+/* Action count tiles */
+.act-counts { display: grid; grid-template-columns: repeat(4,1fr); gap: var(--sp-xs); }
+.ac-tile {
+  background: var(--surface-minimal); border-radius: var(--r-m);
+  border: 1px solid var(--stroke-subtle); padding: var(--sp-xs) var(--sp-3xs);
+  text-align: center; cursor: pointer;
+}
+.ac-tile:active { box-shadow: var(--shadow-m); }
+.ac-n { font-family: var(--ff); font-size: 22px; font-weight: var(--fw-k); color: var(--primary-50); line-height: 1; }
+.ac-l { font-family: var(--ff); font-size: var(--t-body-2xs); font-weight: var(--fw-m); color: var(--text-low); margin-top: 2px; }
+
+/* ─────────────────────────────────────────────────────
+   4. TEAM SNAPSHOT
+───────────────────────────────────────────────────── */
+.snap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-xs); margin-bottom: var(--sp-s); }
+.snap-tile {
+  background: var(--surface-minimal); border-radius: var(--r-m);
+  border: 1px solid var(--stroke-subtle); padding: var(--sp-s);
+}
+.snap-tile .sv { font-family: var(--ff); font-size: 24px; font-weight: var(--fw-k); line-height: 1; }
+.snap-tile .sl { font-family: var(--ff); font-size: var(--t-label-xs); font-weight: var(--fw-m); color: var(--text-low); margin-top: 3px; }
+.snap-tile.pr .sv { color: var(--primary-50); }
+.snap-tile.wa .sv { color: var(--warning); }
+.snap-tile.er .sv { color: var(--error); }
+/* Presence progress bar */
+.presence {
+  background: var(--surface-minimal); border-radius: var(--r-m);
+  border: 1px solid var(--stroke-subtle); padding: var(--sp-s);
+}
+.pr-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-xs); }
+.pr-lbl { font-family: var(--ff); font-size: var(--t-label-s); font-weight: var(--fw-m); color: var(--text-low); }
+.pr-val { font-family: var(--ff); font-size: var(--t-label-l); font-weight: var(--fw-k); color: var(--success); }
+.pr-bar { height: 8px; background: var(--grey-40); border-radius: var(--r-pill); overflow: hidden; }
+.pr-fill { height: 100%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--primary-50), var(--sparkle-50)); width: 86.7%; }
+
+/* ─────────────────────────────────────────────────────
+   5. RECRUITMENT STATUS
+───────────────────────────────────────────────────── */
+.rec-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-xs); }
+.rec-lbl { font-family: var(--ff); font-size: var(--t-body-2xs); font-weight: var(--fw-m); color: var(--text-low); }
+.rec-cnt { font-family: var(--ff); font-size: var(--t-body-2xs); font-weight: var(--fw-b); color: var(--primary-50); }
+.rec-bar { height: 6px; background: var(--grey-40); border-radius: var(--r-pill); overflow: hidden; margin-bottom: 4px; }
+.rec-fill { height: 100%; border-radius: var(--r-pill); background: linear-gradient(90deg, var(--primary-50), var(--sparkle-50)); }
+.rec-sub { font-family: var(--ff); font-size: var(--t-label-2xs); color: var(--text-low); margin-bottom: var(--sp-s); }
+/* JDS Table */
+.rtable { width: 100%; border-collapse: collapse; }
+.rtable th {
+  font-family: var(--ff); font-size: var(--t-overline); font-weight: var(--fw-b);
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-low);
+  text-align: left; padding: var(--sp-3xs) var(--sp-xs);
+  border-bottom: 1px solid var(--grey-40);
+}
+.rtable td {
+  font-family: var(--ff); font-size: var(--t-body-2xs); font-weight: var(--fw-m);
+  color: var(--text-high); padding: var(--sp-xs);
+  border-bottom: 1px solid var(--surface-minimal);
+}
+.rtable tr:last-child td { border-bottom: none; }
+/* JDS Status Badge — text in container */
+.rbadge {
+  display: inline-block; padding: 2px 10px; border-radius: var(--r-pill);
+  font-family: var(--ff); font-size: var(--t-label-2xs); font-weight: var(--fw-b);
+}
+.rb-h { background: rgba(37,171,33,0.10);  color: var(--success); }
+.rb-w { background: rgba(247,171,32,0.14); color: #a06a00; }
+.rb-c { background: rgba(250,47,64,0.10);  color: var(--error); }
+
+/* ─────────────────────────────────────────────────────
+   6. UPCOMING BOOKINGS
+───────────────────────────────────────────────────── */
+.bookings { display: flex; flex-direction: column; gap: var(--sp-xs); }
+.bk-item {
+  display: flex; align-items: center; gap: var(--sp-s);
+  padding: var(--sp-s); background: var(--surface-minimal);
+  border-radius: var(--r-m); border: 1px solid var(--stroke-subtle); cursor: pointer;
+}
+/* JDS date block using primary-20 / sparkle-20 */
+.bk-date {
+  width: 44px; height: 44px; border-radius: var(--r-m);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.bk-date.bl { background: var(--primary-20); }
+.bk-date.tl { background: var(--sparkle-20); }
+.bk-dd { font-family: var(--ff); font-size: 17px; font-weight: var(--fw-k); line-height: 1; }
+.bk-dd.bl { color: var(--primary-50); }
+.bk-dd.tl { color: var(--sparkle-50); }
+.bk-mm { font-family: var(--ff); font-size: var(--t-label-3xs); font-weight: var(--fw-b); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-low); }
+.bk-info { flex: 1; }
+.bk-ttl { font-family: var(--ff); font-size: var(--t-label-l); font-weight: var(--fw-b); color: var(--text-high); }
+.bk-sub { font-family: var(--ff); font-size: var(--t-label-xs); font-weight: var(--fw-n); color: var(--text-low); margin-top: 2px; }
+/* JDS Badge — Informational subtle */
+.bk-chip {
+  font-family: var(--ff); font-size: var(--t-label-2xs); font-weight: var(--fw-b);
+  padding: 3px 10px; border-radius: var(--r-pill); flex-shrink: 0;
+}
+.bk-chip.bl { background: var(--primary-20); color: var(--primary-50); }
+.bk-chip.tl { background: var(--sparkle-20); color: var(--sparkle-60); }
+
+/* ─────────────────────────────────────────────────────
+   7. NEWS & UPDATES — JDS Line Variant Tabs
+───────────────────────────────────────────────────── */
+/* JDS Tabs — Line variant, medium size */
+.tabs-list {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--grey-40);
+  margin-bottom: var(--sp-s);
+}
+.tab-btn {
+  padding: var(--sp-xs) var(--sp-m); /* JDS Line medium: 12px all sides */
+  font-family: var(--ff); font-size: var(--t-label-l); font-weight: var(--fw-m);
+  color: var(--text-low); background: transparent; border: none; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s, border-color .15s;
+}
+.tab-btn.active { color: var(--primary-50); font-weight: var(--fw-b); border-bottom-color: var(--primary-50); }
+.tab-btn:hover:not(.active) { color: var(--primary-50); border-bottom-color: var(--primary-30); }
+/* News list items */
+.news-list { display: flex; flex-direction: column; gap: var(--sp-xs); }
+.news-item {
+  display: flex; gap: var(--sp-s); align-items: flex-start;
+  padding: var(--sp-s); background: var(--surface-minimal);
+  border-radius: var(--r-m); border: 1px solid var(--stroke-subtle);
+}
+/* JDS Icon-only square badge (informational) */
+.ni-icon {
+  width: 36px; height: 36px; border-radius: var(--r-m);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ni-icon svg { width: 18px; height: 18px; fill: currentColor; }
+.ni-icon.p  { background: var(--primary-20);  color: var(--primary-50); }
+.ni-icon.sp { background: var(--sparkle-20);  color: var(--sparkle-60); }
+.ni-icon.sc { background: rgba(247,171,32,0.12); color: #a06a00; }
+.ni-txt { flex: 1; }
+.ni-hl { font-family: var(--ff); font-size: var(--t-body-s); font-weight: var(--fw-b); color: var(--text-high); line-height: 1.35; }
+.ni-ts { font-family: var(--ff); font-size: var(--t-label-2xs); font-weight: var(--fw-n); color: var(--text-low); margin-top: 3px; }
+
+/* ─────────────────────────────────────────────────────
+   JDS BOTTOM NAVIGATION
+   Nav system: 5 items, 48×48 touch targets, pill active
+───────────────────────────────────────────────────── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 430px;
+  background: var(--surface-default);
+  border-top: 1px solid var(--stroke-subtle);
+  display: flex; align-items: center; justify-content: space-around;
+  padding: var(--sp-xs) 0 calc(var(--sp-xs) + env(safe-area-inset-bottom,0px));
+  z-index: 200;
+}
+.nav-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  min-width: 48px; /* JDS touch target min */
+  padding: var(--sp-3xs) var(--sp-xs);
+  border-radius: var(--r-s); border: none; background: transparent;
+  cursor: pointer; font-family: var(--ff); position: relative;
+}
+.nav-btn svg { width: 22px; height: 22px; fill: var(--grey-60); }
+.nav-btn .nlbl { font-family: var(--ff); font-size: var(--t-label-2xs); font-weight: var(--fw-m); color: var(--grey-60); }
+/* Active state: primary-50 icon + label, bold */
+.nav-btn.active svg { fill: var(--primary-50); }
+.nav-btn.active .nlbl { color: var(--primary-50); font-weight: var(--fw-b); }
+/* JDS Notification badge on nav */
+.nav-badge {
+  position: absolute; top: 0; right: 5px;
+  min-width: 16px; height: 16px; border-radius: var(--r-pill);
+  background: var(--error); border: 2px solid var(--surface-default);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff); font-size: var(--t-label-3xs); font-weight: var(--fw-b); color: var(--text-on-bold);
+  padding: 0 3px;
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ════════════════════════════════════
+       JDS HEADER
+  ════════════════════════════════════ -->
+  <header class="header">
+    <!-- JDS Avatar — primary-50 -->
+    <div class="jds-avatar" aria-label="Vikram Kumar">VK</div>
+
+    <div class="hd-greet">
+      <div class="hd-sub">Good morning,</div>
+      <div class="hd-name">Vikram Kumar</div>
+    </div>
+
+    <div class="hd-actions">
+      <!-- IcSearch (JDS) -->
+      <button class="icon-btn" aria-label="Search">
+        <svg viewBox="0 0 24 24"><path d="M10.004 2a7 7 0 015.6 11.19l6.11 6.1a1.002 1.002 0 01-.325 1.639.999.999 0 01-1.095-.219l-6.1-6.11A7 7 0 1110.004 2zm0 12a5 5 0 100-10 5 5 0 000 10z"/></svg>
+      </button>
+      <!-- IcNotification (JDS) + JDS Dot Badge -->
+      <div class="notif-wrap">
+        <button class="icon-btn" aria-label="Notifications, 3 new">
+          <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        </button>
+        <div class="jds-notif-dot"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════ -->
+  <main class="scroll">
+
+    <!-- ── 1. AI MORNING BRIEFING ── -->
+    <section class="briefing" aria-label="AI Morning Briefing">
+      <div class="bf-top">
+        <div class="pulse-dot"></div>
+        <span class="bf-title">AI Morning Briefing</span>
+        <span class="bf-count">3 items need attention</span>
+      </div>
+      <div class="bf-cards">
+
+        <!-- Sales at Risk — IcWarning (JDS) -->
+        <div class="bf-card">
+          <div class="bf-ic r">
+            <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          </div>
+          <div class="bf-card-ttl">Sales at Risk</div>
+          <div class="bf-meta">₹2.4L pipeline</div>
+          <span class="bf-badge r">Push deals</span>
+        </div>
+
+        <!-- Hiring Gap — IcProfile (JDS) -->
+        <div class="bf-card">
+          <div class="bf-ic a">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <div class="bf-card-ttl">Hiring Gap</div>
+          <div class="bf-meta">2 roles critical</div>
+          <span class="bf-badge a">Approve</span>
+        </div>
+
+        <!-- Expense OK — IcSuccess (JDS) -->
+        <div class="bf-card">
+          <div class="bf-ic g">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </div>
+          <div class="bf-card-ttl">Expense OK</div>
+          <div class="bf-meta">Within budget</div>
+          <span class="bf-badge g">Review</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── 2. PERFORMANCE ✦ AI ── -->
+    <section class="card" aria-label="Performance">
+      <div class="sec-head">
+        <span class="sec-lbl">Performance</span>
+        <!-- IcBrain (JDS) as AI indicator -->
+        <span class="ai-chip">
+          <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+          AI
+        </span>
+        <button class="view-all">View all →</button>
+      </div>
+
+      <!-- Main KPI — primary-20/sparkle-20 gradient tile -->
+      <div class="kpi-hero">
+        <div class="kpi-hero-l">
+          <div class="kt">Monthly Sales</div>
+          <div class="kv">₹8.6L</div>
+          <div class="kd">↑ 12% vs last month</div>
+        </div>
+        <!-- SVG Donut: 68% — primary-50 stroke, grey-40 track -->
+        <div class="donut">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#e0e0e0" stroke-width="8"/>
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#3535f3" stroke-width="8"
+              stroke-dasharray="111 52" stroke-linecap="round"/>
+          </svg>
+          <div class="donut-n">68%</div>
+        </div>
+      </div>
+
+      <!-- Sub KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-sub">
+          <div class="ks-tag">Conversion Rate</div>
+          <div class="ks-val" style="color:var(--error)">34%</div>
+          <span class="sbadge sb-r">At Risk</span>
+        </div>
+        <div class="kpi-sub">
+          <div class="ks-tag">Active Deals</div>
+          <div class="ks-val" style="color:var(--success)">147</div>
+          <span class="sbadge sb-g">On Track</span>
+        </div>
+        <div class="kpi-sub">
+          <div class="ks-tag">Cash Burn</div>
+          <div class="ks-val" style="color:var(--warning)">₹1.2L</div>
+          <span class="sbadge sb-w">Off Track</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 3. ACTION ITEMS ✦ AI ── -->
+    <section class="card" aria-label="Action Items">
+      <div class="sec-head">
+        <span class="sec-lbl">Action Items</span>
+        <span class="ai-chip">
+          <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+          AI
+        </span>
+      </div>
+
+      <!-- JDS Primary gradient banner with Inverse button -->
+      <div class="action-banner">
+        <div class="ab-txt">
+          <div class="at">AI can bulk approve 14 items</div>
+          <div class="as">Low-risk leave &amp; travel requests</div>
+        </div>
+        <!-- JDS Button — Primary Inverse -->
+        <button class="btn-inv">Approve All</button>
+      </div>
+
+      <div class="act-counts">
+        <div class="ac-tile"><div class="ac-n">2</div><div class="ac-l">Leave</div></div>
+        <div class="ac-tile"><div class="ac-n">4</div><div class="ac-l">Travel</div></div>
+        <div class="ac-tile"><div class="ac-n">8</div><div class="ac-l">Tasks</div></div>
+        <div class="ac-tile"><div class="ac-n">3</div><div class="ac-l">Other</div></div>
+      </div>
+    </section>
+
+    <!-- ── 4. TEAM SNAPSHOT ── -->
+    <section class="card" aria-label="Team Snapshot">
+      <div class="sec-head">
+        <span class="sec-lbl">Team Snapshot</span>
+        <button class="view-all">View details →</button>
+      </div>
+      <div class="snap-grid">
+        <div class="snap-tile pr"><div class="sv">248</div><div class="sl">Headcount</div></div>
+        <div class="snap-tile">   <div class="sv">215</div><div class="sl">Present Today</div></div>
+        <div class="snap-tile wa"><div class="sv">27</div> <div class="sl">On Leave</div></div>
+        <div class="snap-tile er"><div class="sv">6</div>  <div class="sl">Not In</div></div>
+      </div>
+      <div class="presence">
+        <div class="pr-row">
+          <span class="pr-lbl">Presence Rate</span>
+          <span class="pr-val">86.7%</span>
+        </div>
+        <div class="pr-bar"><div class="pr-fill"></div></div>
+      </div>
+    </section>
+
+    <!-- ── 5. RECRUITMENT STATUS ── -->
+    <section class="card" aria-label="Recruitment Status">
+      <div class="sec-head">
+        <span class="sec-lbl">Recruitment Status</span>
+        <button class="view-all">View all →</button>
+      </div>
+      <div class="rec-top">
+        <span class="rec-lbl">CVs in Pipeline</span>
+        <span class="rec-cnt">84 / 120</span>
+      </div>
+      <div class="rec-bar"><div class="rec-fill" style="width:70%"></div></div>
+      <div class="rec-sub">70% pipeline fill · 8 offers pending</div>
+      <table class="rtable">
+        <thead><tr><th>Role</th><th>Open</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>SDE-1</td><td>3</td><td><span class="rbadge rb-h">Healthy</span></td></tr>
+          <tr><td>Product Manager</td><td>1</td><td><span class="rbadge rb-h">Healthy</span></td></tr>
+          <tr><td>Sr. Designer</td><td>2</td><td><span class="rbadge rb-w">Watch</span></td></tr>
+          <tr><td>Sr. Engineer</td><td>4</td><td><span class="rbadge rb-c">Critical</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── 6. UPCOMING BOOKINGS ── -->
+    <section class="card" aria-label="Upcoming Bookings">
+      <div class="sec-head">
+        <span class="sec-lbl">Upcoming Bookings</span>
+        <button class="view-all">View calendar →</button>
+      </div>
+      <div class="bookings">
+        <div class="bk-item">
+          <div class="bk-date bl">
+            <div class="bk-dd bl">05</div>
+            <div class="bk-mm">Jun</div>
+          </div>
+          <div class="bk-info">
+            <div class="bk-ttl">Board Review</div>
+            <div class="bk-sub">2:00 PM · Boardroom A · Q2 Financials</div>
+          </div>
+          <span class="bk-chip bl">Board</span>
+        </div>
+        <div class="bk-item">
+          <div class="bk-date tl">
+            <div class="bk-dd tl">12</div>
+            <div class="bk-mm">Jun</div>
+          </div>
+          <div class="bk-info">
+            <div class="bk-ttl">Town Hall</div>
+            <div class="bk-sub">11:00 AM · Auditorium · All-hands</div>
+          </div>
+          <span class="bk-chip tl">All-hands</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 7. NEWS & UPDATES ── -->
+    <section class="card" aria-label="News and Updates">
+      <div class="sec-head">
+        <span class="sec-lbl">News &amp; Updates</span>
+      </div>
+
+      <!-- JDS Line Tabs — medium size -->
+      <div class="tabs-list" role="tablist">
+        <button class="tab-btn active" role="tab" aria-selected="true"
+          onclick="switchTab(this,'ann')">Announcements</button>
+        <button class="tab-btn" role="tab" aria-selected="false"
+          onclick="switchTab(this,'bday')">Birthdays</button>
+      </div>
+
+      <!-- Tab: Announcements -->
+      <div id="ann" class="news-list" role="tabpanel">
+        <!-- IcInfo (JDS) -->
+        <div class="news-item">
+          <div class="ni-icon p">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          </div>
+          <div class="ni-txt">
+            <div class="ni-hl">Q2 targets revised — Sales +8% uplift approved</div>
+            <div class="ni-ts">Today · HR &amp; Leadership</div>
+          </div>
+        </div>
+        <!-- IcStar (JDS) -->
+        <div class="news-item">
+          <div class="ni-icon sc">
+            <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          </div>
+          <div class="ni-txt">
+            <div class="ni-hl">Jio PeopleFirst wins Best HR Tech Award 2025</div>
+            <div class="ni-ts">Yesterday · Corporate Comms</div>
+          </div>
+        </div>
+        <!-- IcDocument (JDS) -->
+        <div class="news-item">
+          <div class="ni-icon sp">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          </div>
+          <div class="ni-txt">
+            <div class="ni-hl">New travel policy effective June 15 — review now</div>
+            <div class="ni-ts">2 days ago · Finance</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Birthdays -->
+      <div id="bday" class="news-list" role="tabpanel" style="display:none">
+        <!-- IcCalendarEvent (JDS) -->
+        <div class="news-item">
+          <div class="ni-icon p">
+            <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          </div>
+          <div class="ni-txt">
+            <div class="ni-hl">Priya Sharma turns 32 today</div>
+            <div class="ni-ts">Product Design · Pune</div>
+          </div>
+        </div>
+        <!-- IcStar (JDS) — anniversary -->
+        <div class="news-item">
+          <div class="ni-icon sc">
+            <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          </div>
+          <div class="ni-txt">
+            <div class="ni-hl">Rahul Mehta — 5 year work anniversary</div>
+            <div class="ni-ts">Engineering · Mumbai</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ════════════════════════════════════
+       JDS BOTTOM NAVIGATION
+  ════════════════════════════════════ -->
+  <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+
+    <!-- Home — IcHomeConnection (JDS) -->
+    <button class="nav-btn active" aria-label="Home" aria-current="page">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span class="nlbl">Home</span>
+    </button>
+
+    <!-- Team — IcProfile (JDS) -->
+    <button class="nav-btn" aria-label="Team">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span class="nlbl">Team</span>
+    </button>
+
+    <!-- Approvals — IcConfirm (JDS) + JDS Notification Badge -->
+    <button class="nav-btn" aria-label="Approvals, 17 pending">
+      <div class="nav-badge" aria-hidden="true">17</div>
+      <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      <span class="nlbl">Approvals</span>
+    </button>
+
+    <!-- Reports — IcDocument (JDS) -->
+    <button class="nav-btn" aria-label="Reports">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+      <span class="nlbl">Reports</span>
+    </button>
+
+    <!-- More — IcMoreHorizontal (JDS) -->
+    <button class="nav-btn" aria-label="More options">
+      <svg viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      <span class="nlbl">More</span>
+    </button>
+
+  </nav>
+</div>
+
+<script>
+function switchTab(el, id) {
+  document.querySelectorAll('.tab-btn').forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected','false');
+  });
+  el.classList.add('active');
+  el.setAttribute('aria-selected','true');
+  ['ann','bday'].forEach(k =>
+    document.getElementById(k).style.display = k === id ? 'flex' : 'none'
+  );
+}
+</script>
+</body>
+</html>

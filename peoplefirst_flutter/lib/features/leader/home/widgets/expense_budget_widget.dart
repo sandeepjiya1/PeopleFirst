@@ -9,6 +9,7 @@ import '../../../../providers/leader/decisions_provider.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/pf_card.dart';
 import '../../../../shared/widgets/signal_badge.dart';
+import '../../../../shared/widgets/animated_bar.dart';
 import '../../../../core/utils/formatters.dart';
 
 class ExpenseBudgetWidget extends ConsumerWidget {
@@ -43,30 +44,9 @@ class ExpenseBudgetWidget extends ConsumerWidget {
                     SizedBox(
                       width: 90,
                       height: 90,
-                      child: CustomPaint(
-                        painter: _DonutPainter(data.categories),
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                '${data.spendPercent.toInt()}%',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.contentHeavy,
-                                ),
-                              ),
-                              const Text(
-                                'spent',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: AppColors.contentMinimal,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      child: _AnimatedDonut(
+                        categories: data.categories,
+                        spendPercent: data.spendPercent,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -98,17 +78,22 @@ class ExpenseBudgetWidget extends ConsumerWidget {
                             style: AppTextStyles.captionMinimal,
                           ),
                           const SizedBox(height: 8),
-                          // Progress bar
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(999),
-                            child: LinearProgressIndicator(
-                              value: data.spendLakhs / data.budgetLakhs,
-                              backgroundColor: AppColors.surfaceModerate,
-                              valueColor: const AlwaysStoppedAnimation(
-                                AppColors.warning,
+                          // Animated progress bar
+                          Stack(
+                            children: [
+                              Container(
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceModerate,
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
                               ),
-                              minHeight: 6,
-                            ),
+                              AnimatedBar(
+                                fraction: (data.spendLakhs / data.budgetLakhs).clamp(0.0, 1.0),
+                                color: AppColors.warning,
+                                height: 6,
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -174,6 +159,76 @@ class ExpenseBudgetWidget extends ConsumerWidget {
   }
 }
 
+class _AnimatedDonut extends StatefulWidget {
+  final List<ExpenseCategory> categories;
+  final double spendPercent;
+
+  const _AnimatedDonut({
+    required this.categories,
+    required this.spendPercent,
+  });
+
+  @override
+  State<_AnimatedDonut> createState() => _AnimatedDonutState();
+}
+
+class _AnimatedDonutState extends State<_AnimatedDonut>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _anim,
+      builder: (_, __) => CustomPaint(
+        painter: _DonutPainter(widget.categories, _anim.value),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${widget.spendPercent.toInt()}%',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.contentHeavy,
+                ),
+              ),
+              const Text(
+                'spent',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: AppColors.contentMinimal,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _CategoryRow extends StatelessWidget {
   final ExpenseCategory category;
   final double maxSpend;
@@ -225,14 +280,21 @@ class _CategoryRow extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 5),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: barFrac,
-              backgroundColor: AppColors.surfaceModerate,
-              valueColor: AlwaysStoppedAnimation(signalDotColor(category.tone)),
-              minHeight: 4,
-            ),
+          Stack(
+            children: [
+              Container(
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceModerate,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+              AnimatedBar(
+                fraction: barFrac,
+                color: signalDotColor(category.tone),
+                height: 4,
+              ),
+            ],
           ),
         ],
       ),
@@ -242,8 +304,9 @@ class _CategoryRow extends StatelessWidget {
 
 class _DonutPainter extends CustomPainter {
   final List<ExpenseCategory> categories;
+  final double progress;
 
-  _DonutPainter(this.categories);
+  _DonutPainter(this.categories, this.progress);
 
   static const List<Color> _colors = [
     AppColors.negative,
@@ -265,18 +328,20 @@ class _DonutPainter extends CustomPainter {
     double startAngle = -math.pi / 2;
 
     for (int i = 0; i < categories.length; i++) {
-      final sweep = (categories[i].spendLakhs / total) * 2 * math.pi;
+      final sweep = (categories[i].spendLakhs / total) * 2 * math.pi * progress;
       final paint = Paint()
         ..color = _colors[i % _colors.length]
         ..strokeWidth = strokeWidth
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.butt;
 
-      canvas.drawArc(rect, startAngle, sweep - 0.05, false, paint);
-      startAngle += sweep;
+      final gap = progress >= 1.0 ? 0.05 : 0.0;
+      canvas.drawArc(rect, startAngle, sweep - gap, false, paint);
+      startAngle += (categories[i].spendLakhs / total) * 2 * math.pi * progress;
     }
   }
 
   @override
-  bool shouldRepaint(_DonutPainter old) => false;
+  bool shouldRepaint(_DonutPainter old) =>
+      old.categories != categories || old.progress != progress;
 }

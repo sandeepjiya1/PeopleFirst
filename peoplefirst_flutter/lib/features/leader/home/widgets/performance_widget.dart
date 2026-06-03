@@ -9,6 +9,7 @@ import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/pf_card.dart';
 import '../../../../shared/widgets/signal_badge.dart';
 import '../../../../shared/widgets/trend_badge.dart';
+import '../../../../shared/widgets/animated_count.dart';
 
 class PerformanceWidget extends ConsumerWidget {
   final VoidCallback? onReports;
@@ -50,8 +51,9 @@ class PerformanceWidget extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      '${data.mainValue.toInt()}%',
+                    AnimatedCount(
+                      target: data.mainValue,
+                      suffix: '%',
                       style: AppTextStyles.bigNumber,
                     ),
                     const SizedBox(width: 8),
@@ -63,9 +65,7 @@ class PerformanceWidget extends ConsumerWidget {
                     SizedBox(
                       width: 80,
                       height: 40,
-                      child: CustomPaint(
-                        painter: _SparklinePainter(data.sparkline),
-                      ),
+                      child: _AnimatedSparkline(data: data.sparkline),
                     ),
                   ],
                 ),
@@ -80,6 +80,50 @@ class PerformanceWidget extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _AnimatedSparkline extends StatefulWidget {
+  final List<double> data;
+
+  const _AnimatedSparkline({required this.data});
+
+  @override
+  State<_AnimatedSparkline> createState() => _AnimatedSparklineState();
+}
+
+class _AnimatedSparklineState extends State<_AnimatedSparkline>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeOut);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _anim,
+      builder: (_, __) => CustomPaint(
+        painter: _SparklinePainter(widget.data, _anim.value),
+      ),
     );
   }
 }
@@ -125,8 +169,9 @@ class _SubMetricRow extends StatelessWidget {
 
 class _SparklinePainter extends CustomPainter {
   final List<double> data;
+  final double progress;
 
-  _SparklinePainter(this.data);
+  _SparklinePainter(this.data, this.progress);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -172,20 +217,31 @@ class _SparklinePainter extends CustomPainter {
     fillPath.lineTo(size.width, size.height);
     fillPath.close();
 
-    canvas.drawPath(fillPath, fillPaint);
-    canvas.drawPath(path, paint);
+    // Animate via PathMetrics
+    final pathMetrics = path.computeMetrics();
+    for (final metric in pathMetrics) {
+      final extracted = metric.extractPath(0, metric.length * progress);
+      canvas.drawPath(extracted, paint);
+    }
 
-    // Dot at last point
-    final lastX = size.width;
-    final lastY =
-        size.height - ((data.last - min) / range) * size.height;
-    canvas.drawCircle(
-      Offset(lastX, lastY),
-      3,
-      Paint()..color = AppColors.relianceBase,
-    );
+    // Animate fill too
+    if (progress >= 1.0) {
+      canvas.drawPath(fillPath, fillPaint);
+    }
+
+    // Dot at last point (only when fully drawn)
+    if (progress >= 0.98) {
+      final lastX = size.width;
+      final lastY = size.height - ((data.last - min) / range) * size.height;
+      canvas.drawCircle(
+        Offset(lastX, lastY),
+        3,
+        Paint()..color = AppColors.relianceBase,
+      );
+    }
   }
 
   @override
-  bool shouldRepaint(_SparklinePainter old) => old.data != data;
+  bool shouldRepaint(_SparklinePainter old) =>
+      old.data != data || old.progress != progress;
 }

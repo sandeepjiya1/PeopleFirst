@@ -1,31 +1,6 @@
 /* global React, Icon, ColorIcon, Button, Card, Signal, Dot, Widget, Stat, Trend */
 const { useState } = React;
 
-function useCountUp(target, { suffix = '', prefix = '', decimals = 0, duration = 1000, delay = 0 } = {}) {
-  const [val, setVal] = React.useState(0);
-  const ref = React.useRef(null);
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      obs.disconnect();
-      const start = performance.now() + delay;
-      const step = (now) => {
-        const elapsed = Math.max(0, now - start);
-        const pct = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - pct, 3);
-        setVal(Math.round(target * eased * Math.pow(10, decimals)) / Math.pow(10, decimals));
-        if (pct < 1) requestAnimationFrame(step);
-      };
-      requestAnimationFrame(step);
-    }, { threshold: 0.3 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [target, duration, delay]);
-  return { ref, display: `${prefix}${val.toLocaleString('en-IN')}${suffix}` };
-}
-
 // ═══════════════════════════════════════════════════════════════
 // 1 · AI MORNING BRIEFING — the chief of staff
 // ═══════════════════════════════════════════════════════════════
@@ -42,13 +17,12 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
       borderRadius: 20, overflow: "hidden",
       border: "1px solid var(--sky-border)",
       boxShadow: "0 1px 3px rgba(15,23,42,.05), 0 8px 24px -12px var(--sky-shadow)",
-      background: "var(--surface-minimal)",
-      animation: "fadeInScale .5s cubic-bezier(.2,0,0,1) .05s both"
+      background: "var(--surface-minimal)"
     }}>
       {/* Sky header band */}
       <div style={{ background: "linear-gradient(180deg, var(--sky-light) 0%, color-mix(in oklch, var(--sky-light) 55%, white) 100%)", padding: "15px 16px 14px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-          <span className="ai-sparkle" style={{
+          <span style={{
             width: 30, height: 30, borderRadius: 9, background: "var(--sky)", display: "flex",
             alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px -1px var(--sky-shadow)"
           }}>
@@ -58,6 +32,12 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
             <div style={{ fontSize: 14, fontWeight: 800, color: "var(--sky-ink)", letterSpacing: "-.01em" }}>PeopleFirst AI</div>
             <div style={{ fontSize: 11.5, color: "var(--sky-ink)", opacity: .7, fontWeight: 500, marginTop: -1 }}>Overnight brief · updated 8:47am</div>
           </div>
+          <button onClick={onOpenAssistant} aria-label="Ask AI" style={{
+            width: 32, height: 32, borderRadius: 999, border: "1px solid var(--sky-border)", background: "rgba(255,255,255,.7)",
+            display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer"
+          }}>
+            <Icon name="send_message" size={16} color="var(--sky)" />
+          </button>
         </div>
         <p style={{ margin: "13px 2px 2px", fontSize: 17, fontWeight: 700, lineHeight: 1.32, color: "var(--content-heavy)", letterSpacing: "-.01em", textWrap: "pretty" }}>
           <span style={{ color: "var(--sky-ink)" }}>{decisions.length} critical {decisions.length === 1 ? "item" : "items"}</span> for today
@@ -100,7 +80,7 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
         display: "flex", alignItems: "center", gap: 8
       }}>
         <Icon name="check" size={16} color="var(--positive)" />
-        <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", flex: 1, textAlign: "left" }}>Auto approved request · {handledTotal}
+        <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", flex: 1, textAlign: "left" }} data-comment-anchor="b2a89c5c34-span-83-9">AI handled overnight · {handledTotal}
 
         </span>
         <Icon name={expanded ? "chevron_up" : "chevron_down"} size={18} color="var(--content-minimal)" />
@@ -124,7 +104,6 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
 // 2 · PERFORMANCE — honest read of the month
 // ═══════════════════════════════════════════════════════════════
 function Performance({ onOpen }) {
-  const cuPerf = useCountUp(86, { suffix: '%', duration: 1200, delay: 200 });
   const bars = [62, 70, 66, 74, 80, 86]; // last 6 weeks
   // Priority first: off-track and at-risk lead; healthy drops to the bottom.
   const subs = [
@@ -140,14 +119,14 @@ function Performance({ onOpen }) {
           <div>
             <div style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Work finished on time · May</div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 9, marginTop: 6 }}>
-              <span ref={cuPerf.ref} style={{ fontSize: 38, fontWeight: 900, lineHeight: .9, letterSpacing: "-.03em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>{cuPerf.display}</span>
+              <span style={{ fontSize: 38, fontWeight: 900, lineHeight: .9, letterSpacing: "-.03em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>86%</span>
               <Trend dir="up">+4 pts</Trend>
             </div>
           </div>
           {/* trend chart — last 6 weeks */}
           {(() => {
-            const w = 104, h = 46, pad = 5;
-            const lo = Math.min(...bars), hi = Math.max(...bars), span = hi - lo || 1;
+            const w = 104,h = 46,pad = 5;
+            const lo = Math.min(...bars),hi = Math.max(...bars),span = hi - lo || 1;
             const pts = bars.map((v, i) => [Math.round(i * (w / (bars.length - 1)) * 10) / 10, Math.round((h - pad - (v - lo) / span * (h - pad * 2)) * 10) / 10]);
             const line = "M" + pts.map((p) => p.join(",")).join(" L ");
             const area = line + ` L ${w},${h} L 0,${h} Z`;
@@ -160,9 +139,9 @@ function Performance({ onOpen }) {
                     <stop offset="100%" stopColor="var(--reliance-base)" stopOpacity="0" />
                   </linearGradient>
                 </defs>
-                <path className="sparkline-area" d={area} fill="url(#perfFill)" />
-                <path className="sparkline-line" d={line} fill="none" stroke="var(--reliance-base)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <circle className="sparkline-dot" cx={last[0]} cy={last[1]} r="3.5" fill="var(--reliance-base)" stroke="var(--surface-minimal)" strokeWidth="2" />
+                <path d={area} fill="url(#perfFill)" />
+                <path d={line} fill="none" stroke="var(--reliance-base)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx={last[0]} cy={last[1]} r="3.5" fill="var(--reliance-base)" stroke="var(--surface-minimal)" strokeWidth="2" />
               </svg>);
 
           })()}
@@ -197,12 +176,11 @@ function ActionItems({ state, onBulkApprove, onOpen }) {
   { label: "Sign-offs", n: 2, icon: "document", filter: "Sign-off", tint: "var(--positive)", tintBg: "var(--positive-light)" }];
 
   const remaining = state.total - state.approved;
-  const cuRemaining = useCountUp(remaining, { duration: 700 });
   return (
     <Widget icon="confirm" title="Approvals" action="See all" onAction={() => onOpen()}>
       <Card surface="elev" pad={16}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-          <span ref={cuRemaining.ref} style={{ fontSize: 30, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{cuRemaining.display}</span>
+          <span style={{ fontSize: 30, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{remaining}</span>
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-moderate)" }}>waiting for you</span>
         </div>
 
@@ -219,24 +197,31 @@ function ActionItems({ state, onBulkApprove, onOpen }) {
           )}
         </div>
 
-        {/* Critical item — highlighted as the primary action */}
-        <button onClick={() => onOpen("Travel")} style={{ width: "100%", textAlign: "left", marginTop: 14, padding: "13px 14px", borderRadius: 13, background: "var(--negative-light)", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#6a0202", lineHeight: 1.4, textWrap: "pretty" }}>Rohan Das is scheduled to travel to Bengaluru tomorrow. Please review and approve the ₹38,500 request.</div>
+        {state.approved === 0 ?
+        <div style={{ marginTop: 13, padding: "12px 13px", borderRadius: 12, background: "var(--sky-light)", display: "flex", alignItems: "center", gap: 11 }}>
+            <Icon name="ai_sparkle" size={18} color="var(--sky)" />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--sky-ink)", lineHeight: 1.3 }}>{state.lowRisk} are low-risk and follow the rules.</div>
+              <div style={{ fontSize: 12, color: "var(--sky-ink)", opacity: .72, marginTop: 1 }}>Normal leave and expenses under ₹10,000.</div>
+            </div>
+          </div> :
+
+        <div style={{ marginTop: 13, padding: "12px 13px", borderRadius: 12, background: "var(--positive-light)", display: "flex", alignItems: "center", gap: 11 }}>
+            <Icon name="confirm" size={18} color="var(--positive)" />
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--positive)", lineHeight: 1.3 }}>AI approved {state.approved} for you.</div>
           </div>
-        </button>
+        }
 
-        {/* Low-risk handled automatically — de-emphasised */}
-        <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 11, padding: "0 2px" }}>
-          <Icon name="ai_sparkle" size={15} color="var(--sky)" style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600, lineHeight: 1.35 }}>{state.lowRisk} low-risk approvals handled automatically</span>
-        </div>
-
+        {state.approved === 0 &&
+        <Button variant="sky" size="m" full style={{ marginTop: 11 }} icon="ai_sparkle" onClick={onBulkApprove}>
+            Approve {state.lowRisk} low-risk for me
+          </Button>
+        }
         {remaining > 0 &&
-        <button onClick={() => onOpen()} style={{
-          width: "100%", marginTop: 12, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
+        <button onClick={onOpen} style={{
+          width: "100%", marginTop: 9, background: "none", border: "none", cursor: "pointer", fontFamily: "inherit",
           fontSize: 13.5, fontWeight: 700, color: "var(--reliance-base)"
-        }}>See all approvals</button>
+        }}>I'll check the other {remaining} myself</button>
         }
       </Card>
     </Widget>);
@@ -248,12 +233,6 @@ function ActionItems({ state, onBulkApprove, onOpen }) {
 // ═══════════════════════════════════════════════════════════════
 function TeamSnapshot({ onOpen }) {
   const total = 250,present = 204,leave = 20,notIn = 10,woph = 16; // sums to 250
-  const cuTotal = useCountUp(250, { duration: 900 });
-  const cuPresent = useCountUp(204, { duration: 900, delay: 100 });
-  const cuLeave = useCountUp(20, { duration: 900, delay: 150 });
-  const cuNotIn = useCountUp(10, { duration: 900, delay: 200 });
-  const cuWoph = useCountUp(16, { duration: 900, delay: 250 });
-  const cellCountUps = [cuPresent, cuLeave, cuNotIn, cuWoph];
   const cells = [
   { label: "Present", value: present, tone: "healthy" },
   { label: "On leave", value: leave, tone: "info" },
@@ -269,18 +248,18 @@ function TeamSnapshot({ onOpen }) {
           <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Headcount</span>
           <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--positive)", fontVariantNumeric: "tabular-nums" }}>{Math.round(present / total * 100)}% present</span>
         </div>
-        <div ref={cuTotal.ref} style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1, marginTop: 5 }}>{cuTotal.display}</div>
+        <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1, marginTop: 5 }}>{total}</div>
         {/* presence bar */}
         <div style={{ display: "flex", height: 8, borderRadius: 999, overflow: "hidden", gap: 2, margin: "12px 0 14px" }}>
-          <span className="presence-seg" style={{ flex: present, background: "var(--positive)" }} />
-          <span className="presence-seg" style={{ flex: leave, background: "var(--sky)" }} />
-          <span className="presence-seg" style={{ flex: notIn, background: "var(--warning)" }} />
-          <span className="presence-seg" style={{ flex: woph, background: "var(--content-minimal)" }} />
+          <span style={{ flex: present, background: "var(--positive)" }} />
+          <span style={{ flex: leave, background: "var(--sky)" }} />
+          <span style={{ flex: notIn, background: "var(--warning)" }} />
+          <span style={{ flex: woph, background: "var(--content-minimal)" }} />
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
           {cells.map((c, i) =>
           <div key={c.label} style={{ textAlign: "center", borderLeft: i ? "1px solid var(--stroke-minimal)" : "none" }}>
-              <div style={{ fontSize: 22, fontWeight: 900, color: toneColor[c.tone], fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}><span ref={cellCountUps[i].ref}>{cellCountUps[i].display}</span></div>
+              <div style={{ fontSize: 22, fontWeight: 900, color: toneColor[c.tone], fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{c.value}</div>
               <div style={{ fontSize: 11.5, color: "var(--content-moderate)", fontWeight: 600, marginTop: 5 }}>{c.label}</div>
             </div>
           )}
@@ -301,7 +280,6 @@ function Recruitment({ onOpen }) {
 
   const cvs = 379,target = 400;
   const cvPct = Math.round(cvs / target * 1000) / 10; // 94.8
-  const cuCvs = useCountUp(379, { duration: 1000 });
   return (
     <Widget
       icon="id" title="Recruitment" action="All 8 roles" onAction={onOpen}
@@ -314,11 +292,11 @@ function Recruitment({ onOpen }) {
           <Trend dir="up">12%</Trend>
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 5 }}>
-          <span ref={cuCvs.ref} style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{cuCvs.display}</span>
+          <span style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{cvs}</span>
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-minimal)" }}>of {target}</span>
         </div>
         <div style={{ height: 6, borderRadius: 999, background: "var(--surface-subtle)", marginTop: 11, overflow: "hidden" }}>
-          <div className="anim-bar" style={{ height: "100%", width: `${cvPct}%`, borderRadius: 999, background: "var(--positive)" }} />
+          <div style={{ height: "100%", width: `${cvPct}%`, borderRadius: 999, background: "var(--positive)" }} />
         </div>
 
         {/* roles */}
@@ -456,10 +434,6 @@ function ExpenseBudget({ onOpen }) {
   { label: "Tooling & SaaS", value: "₹17L", tone: "healthy", note: "On plan" },
   { label: "Training & events", value: "₹10L", tone: "off", note: "+15% vs plan" }];
 
-  // Critical (off) first, then at-risk, then healthy
-  const toneRank = { off: 0, risk: 1, healthy: 2 };
-  cats.sort((a, b) => toneRank[a.tone] - toneRank[b.tone]);
-
   const noteColor = (t) => t === "healthy" ? "var(--positive)" : t === "risk" ? "var(--warning)" : "var(--negative)";
 
   return (
@@ -475,7 +449,7 @@ function ExpenseBudget({ onOpen }) {
           </div>
         </div>
         <div style={{ height: 8, borderRadius: 999, background: "var(--surface-subtle)", marginTop: 13, overflow: "hidden" }}>
-          <div className="anim-bar" style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: "var(--reliance-base)" }} />
+          <div style={{ height: "100%", width: `${pct}%`, borderRadius: 999, background: "var(--reliance-base)" }} />
         </div>
 
         {/* AI recommendation — light sky */}
@@ -501,150 +475,5 @@ function ExpenseBudget({ onOpen }) {
 }
 
 Object.assign(window, {
-  AIBriefing, Performance, ExpenseBudget, ExpenseBudgetBars, ActionItems, TeamSnapshot, Recruitment, Bookings, News
+  AIBriefing, Performance, ExpenseBudget, ActionItems, TeamSnapshot, Recruitment, Bookings, News
 });
-
-// ═══════════════════════════════════════════════════════════════
-// EXPENSE & BUDGET (bar-graph variant) — same data, vertical bars
-// ═══════════════════════════════════════════════════════════════
-function ExpenseBudgetBars({ onOpen }) {
-  const cuSpent = useCountUp(86, { prefix: '₹', suffix: 'L', duration: 1000 });
-  const pct = 83, pace = 79, spent = 86, plan = 104;
-  const cats = [
-  { label: "Travel", value: 35, display: "₹35L", tone: "risk", note: "+8%" },
-  { label: "Contractors", value: 24, display: "₹24L", tone: "healthy", note: "On track" },
-  { label: "Tooling", value: 17, display: "₹17L", tone: "healthy", note: "On track" },
-  { label: "Training", value: 10, display: "₹10L", tone: "off", note: "+15%" }];
-
-  const toneRank = { off: 0, risk: 1, healthy: 2 };
-  cats.sort((a, b) => toneRank[a.tone] - toneRank[b.tone]);
-  const barColor = (t) => t === "healthy" ? "var(--positive)" : t === "risk" ? "var(--warning)" : "var(--negative)";
-  const noteColor = (t) => t === "healthy" ? "var(--content-minimal)" : t === "risk" ? "var(--warning)" : "var(--negative)";
-  const max = Math.max(...cats.map((c) => c.value));
-  const total = cats.reduce((s, c) => s + c.value, 0);
-
-  return (
-    <Widget title="Expense by category" action="Breakdown" onAction={onOpen}>
-      <Card surface="elev" pad={18}>
-        {/* Header: spend vs plan with a small composition pie */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-          <div>
-            <div style={{ fontSize: 12, color: "var(--content-minimal)", fontWeight: 600, textTransform: "uppercase", letterSpacing: ".03em" }}>Q2 spend</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 7 }}>
-              <span ref={cuSpent.ref} style={{ fontSize: 32, fontWeight: 900, lineHeight: .9, letterSpacing: "-.03em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>{cuSpent.display}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-minimal)" }}>of ₹1.04 Cr</span>
-            </div>
-          </div>
-          {(() => {
-            const ps = 54, pr = ps / 2, c2 = 2 * Math.PI * pr / 2; // using full-disc pie
-            let acc = 0;
-            const slices = cats.map((c) => { const frac = c.value / total; const s = { c, frac, start: acc }; acc += frac; return s; });
-            // build conic-gradient stops
-            const stops = slices.map((s) => `${barColor(s.c.tone)} ${(s.start * 100).toFixed(1)}% ${((s.start + s.frac) * 100).toFixed(1)}%`).join(", ");
-            return <span style={{ width: ps, height: ps, borderRadius: "50%", flexShrink: 0, background: `conic-gradient(${stops})`, WebkitMaskImage: "radial-gradient(circle, transparent 40%, #000 41%)", maskImage: "radial-gradient(circle, transparent 40%, #000 41%)" }} />;
-          })()}
-        </div>
-
-        {/* AI recommendation — light sky */}
-        <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 14, padding: "10px 12px", borderRadius: 12, background: "var(--sky-light)" }}>
-          <Icon name="ai_sparkle" size={16} color="var(--sky)" style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.35 }}>
-            {pct - pace}% over plan · <span style={{ color: "var(--sky-ink)" }}>team travel is the main driver</span>
-          </span>
-        </div>
-
-        {/* Horizontal bar list — label, proportional fill, amount + share */}
-        <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 14 }}>
-          {cats.map((c) =>
-          <div key={c.label}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-                <span style={{ width: 7, height: 7, borderRadius: 999, background: barColor(c.tone), flexShrink: 0 }} />
-                <span style={{ fontSize: 13.5, fontWeight: 700, color: "var(--content-heavy)", flex: 1, letterSpacing: "-.01em" }}>{c.label}</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: noteColor(c.tone), whiteSpace: "nowrap" }}>{c.note}</span>
-                <span style={{ fontSize: 13.5, fontWeight: 800, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", minWidth: 42, textAlign: "right" }}>{c.display}</span>
-              </div>
-              <div style={{ height: 8, borderRadius: 999, background: "var(--surface-subtle)", overflow: "hidden" }}>
-                <div className="anim-bar" style={{ height: "100%", width: `${c.value / max * 100}%`, minWidth: 8, borderRadius: 999, background: barColor(c.tone) }} />
-              </div>
-            </div>
-          )}
-        </div>
-      </Card>
-    </Widget>);
-
-}
-
-Object.assign(window, { ExpenseBudgetBars });
-
-// ═══════════════════════════════════════════════════════════════
-// EXPENSE & BUDGET (donut variant) — composition of spend
-// ═══════════════════════════════════════════════════════════════
-function ExpenseBudgetDonut({ onOpen }) {
-  const pct = 83, pace = 79;
-  const cats = [
-  { label: "Travel", value: 35, display: "₹35L", tone: "risk", note: "+8%" },
-  { label: "Contractors", value: 24, display: "₹24L", tone: "healthy", note: "On track" },
-  { label: "Tooling", value: 17, display: "₹17L", tone: "healthy", note: "On track" },
-  { label: "Training", value: 10, display: "₹10L", tone: "off", note: "+15%" }];
-
-  const toneRank = { off: 0, risk: 1, healthy: 2 };
-  cats.sort((a, b) => toneRank[a.tone] - toneRank[b.tone]);
-  const color = (t) => t === "healthy" ? "var(--positive)" : t === "risk" ? "var(--warning)" : "var(--negative)";
-  const noteColor = (t) => t === "healthy" ? "var(--content-minimal)" : t === "risk" ? "var(--warning)" : "var(--negative)";
-  const total = cats.reduce((s, c) => s + c.value, 0);
-
-  // donut geometry
-  const size = 108, stroke = 16, r = (size - stroke) / 2, circ = 2 * Math.PI * r;
-  let offset = 0;
-  const segs = cats.map((c) => {
-    const len = c.value / total * circ;
-    const seg = { c, len, dashoffset: -offset };
-    offset += len;
-    return seg;
-  });
-
-  return (
-    <Widget title="Expense by category" action="Breakdown" onAction={onOpen}>
-      <Card surface="elev" pad={18}>
-        {/* AI recommendation — light sky */}
-        <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "10px 12px", borderRadius: 12, background: "var(--sky-light)" }}>
-          <Icon name="ai_sparkle" size={16} color="var(--sky)" style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.35 }}>
-            {pct - pace}% over plan · <span style={{ color: "var(--sky-ink)" }}>team travel is the main driver</span>
-          </span>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 16 }}>
-          {/* donut */}
-          <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
-            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: "rotate(-90deg)" }}>
-              {segs.map((s, i) =>
-              <circle key={i} cx={size / 2} cy={size / 2} r={r} fill="none"
-                stroke={color(s.c.tone)} strokeWidth={stroke}
-                strokeDasharray={`${Math.max(0, s.len - 2)} ${circ - Math.max(0, s.len - 2)}`}
-                strokeDashoffset={s.dashoffset} />
-              )}
-            </svg>
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ fontSize: 20, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.02em", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>₹86L</span>
-              <span style={{ fontSize: 10.5, fontWeight: 600, color: "var(--content-minimal)", marginTop: 2 }}>of ₹1.04 Cr</span>
-            </div>
-          </div>
-          {/* legend */}
-          <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 10 }}>
-            {cats.map((c) =>
-            <div key={c.label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 9, height: 9, borderRadius: 3, background: color(c.tone), flexShrink: 0 }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", flex: 1, letterSpacing: "-.01em" }}>{c.label}</span>
-                <span style={{ fontSize: 11.5, fontWeight: 600, color: noteColor(c.tone), whiteSpace: "nowrap" }}>{c.note}</span>
-                <span style={{ fontSize: 13, fontWeight: 800, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", minWidth: 40, textAlign: "right" }}>{c.display}</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </Card>
-    </Widget>);
-
-}
-
-Object.assign(window, { ExpenseBudgetDonut });

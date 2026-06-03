@@ -7,6 +7,7 @@ import '../../../../providers/employee/attendance_provider.dart';
 import '../../../../providers/toast_provider.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/pf_card.dart';
+import '../../../../shared/widgets/widget_entrance.dart';
 import '../../../../core/utils/formatters.dart';
 
 class AttendanceWidget extends ConsumerWidget {
@@ -41,22 +42,25 @@ class AttendanceWidget extends ConsumerWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: _AttendanceCell(
-                    label: 'Mark In',
-                    value: record.markedIn != null
-                        ? Formatters.timeOfDay(record.markedIn!)
-                        : '--',
-                    isActive: record.status == AttendanceStatus.out,
-                    onTap: record.status == AttendanceStatus.out
-                        ? () {
-                            ref
-                                .read(attendanceProvider.notifier)
-                                .markIn();
-                            ref
-                                .read(toastProvider.notifier)
-                                .show('Marked in at ${Formatters.timeOfDay(DateTime.now())}');
-                          }
-                        : null,
+                  child: WidgetEntrance(
+                    index: 0,
+                    child: _AttendanceCell(
+                      label: 'Mark In',
+                      value: record.markedIn != null
+                          ? Formatters.timeOfDay(record.markedIn!)
+                          : '--',
+                      isActive: record.status == AttendanceStatus.out,
+                      onTap: record.status == AttendanceStatus.out
+                          ? () {
+                              ref
+                                  .read(attendanceProvider.notifier)
+                                  .markIn();
+                              ref
+                                  .read(toastProvider.notifier)
+                                  .show('Marked in at ${Formatters.timeOfDay(DateTime.now())}');
+                            }
+                          : null,
+                    ),
                   ),
                 ),
                 Container(
@@ -65,24 +69,27 @@ class AttendanceWidget extends ConsumerWidget {
                   color: AppColors.strokeMinimal,
                 ),
                 Expanded(
-                  child: _AttendanceCell(
-                    label: 'Mark Out',
-                    value: record.markedOut != null
-                        ? Formatters.timeOfDay(record.markedOut!)
-                        : record.status == AttendanceStatus.in_
-                            ? 'Tap to mark'
-                            : '--',
-                    isActive: record.status == AttendanceStatus.in_,
-                    onTap: record.status == AttendanceStatus.in_
-                        ? () {
-                            ref
-                                .read(attendanceProvider.notifier)
-                                .markOut();
-                            ref
-                                .read(toastProvider.notifier)
-                                .show('Marked out at ${Formatters.timeOfDay(DateTime.now())}');
-                          }
-                        : null,
+                  child: WidgetEntrance(
+                    index: 1,
+                    child: _AttendanceCell(
+                      label: 'Mark Out',
+                      value: record.markedOut != null
+                          ? Formatters.timeOfDay(record.markedOut!)
+                          : record.status == AttendanceStatus.in_
+                              ? 'Tap to mark'
+                              : '--',
+                      isActive: record.status == AttendanceStatus.in_,
+                      onTap: record.status == AttendanceStatus.in_
+                          ? () {
+                              ref
+                                  .read(attendanceProvider.notifier)
+                                  .markOut();
+                              ref
+                                  .read(toastProvider.notifier)
+                                  .show('Marked out at ${Formatters.timeOfDay(DateTime.now())}');
+                            }
+                          : null,
+                    ),
                   ),
                 ),
                 Container(
@@ -91,7 +98,10 @@ class AttendanceWidget extends ConsumerWidget {
                   color: AppColors.strokeMinimal,
                 ),
                 Expanded(
-                  child: _DurationCell(record: record),
+                  child: WidgetEntrance(
+                    index: 2,
+                    child: _DurationCell(record: record),
+                  ),
                 ),
               ],
             ),

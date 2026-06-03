@@ -6,6 +6,7 @@ import '../../../../data/models/booking.dart';
 import '../../../../providers/employee/tasks_provider.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/pf_card.dart';
+import '../../../../shared/widgets/widget_entrance.dart';
 
 class BookingsEmpWidget extends ConsumerWidget {
   const BookingsEmpWidget({super.key});
@@ -31,12 +32,15 @@ class BookingsEmpWidget extends ConsumerWidget {
           data: (bookings) => SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: bookings.map((b) {
+              children: List.generate(bookings.length, (i) {
                 return Padding(
                   padding: const EdgeInsets.only(right: 10),
-                  child: _BookingCard(booking: b),
+                  child: WidgetEntrance(
+                    index: i,
+                    child: _BookingCard(booking: bookings[i]),
+                  ),
                 );
-              }).toList(),
+              }),
             ),
           ),
         ),

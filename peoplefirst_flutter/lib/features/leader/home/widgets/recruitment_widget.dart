@@ -9,6 +9,8 @@ import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/pf_card.dart';
 import '../../../../shared/widgets/signal_badge.dart';
 import '../../../../shared/widgets/trend_badge.dart';
+import '../../../../shared/widgets/animated_count.dart';
+import '../../../../shared/widgets/animated_bar.dart';
 
 class RecruitmentWidget extends ConsumerWidget {
   const RecruitmentWidget({super.key});
@@ -42,23 +44,43 @@ class RecruitmentWidget extends ConsumerWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        RichText(
-                          text: TextSpan(
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            AnimatedCount(
+                              target: summary.totalCvs.toDouble(),
+                              style: AppTextStyles.bigNumber.copyWith(
+                                fontSize: 28,
+                              ),
+                            ),
+                            Text(
+                              ' / ${summary.targetCvs}',
+                              style: AppTextStyles.caption,
+                            ),
+                          ],
+                        ),
+                        Text('CVs in pipeline', style: AppTextStyles.caption),
+                        const SizedBox(height: 6),
+                        SizedBox(
+                          width: 120,
+                          child: Stack(
                             children: [
-                              TextSpan(
-                                text: '${summary.totalCvs}',
-                                style: AppTextStyles.bigNumber.copyWith(
-                                  fontSize: 28,
+                              Container(
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceModerate,
+                                  borderRadius: BorderRadius.circular(999),
                                 ),
                               ),
-                              TextSpan(
-                                text: ' / ${summary.targetCvs}',
-                                style: AppTextStyles.caption,
+                              AnimatedBar(
+                                fraction: (summary.totalCvs / (summary.targetCvs > 0 ? summary.targetCvs : 1)).clamp(0.0, 1.0),
+                                color: AppColors.positive,
+                                height: 4,
                               ),
                             ],
                           ),
                         ),
-                        Text('CVs in pipeline', style: AppTextStyles.caption),
                       ],
                     ),
                     const SizedBox(width: 12),

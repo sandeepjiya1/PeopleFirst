@@ -6,6 +6,8 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../providers/leader/decisions_provider.dart';
 import '../../../../shared/widgets/section_header.dart';
 import '../../../../shared/widgets/pf_card.dart';
+import '../../../../shared/widgets/animated_count.dart';
+import '../../../../shared/widgets/animated_bar.dart';
 
 class TeamSnapshotWidget extends ConsumerWidget {
   const TeamSnapshotWidget({super.key});
@@ -33,11 +35,12 @@ class TeamSnapshotWidget extends ConsumerWidget {
           ),
           error: (_, __) => const SizedBox.shrink(),
           data: (snapshot) {
-            final total = snapshot['total'] ?? 0;
-            final present = snapshot['present'] ?? 0;
-            final onLeave = snapshot['onLeave'] ?? 0;
-            final notIn = snapshot['notIn'] ?? 0;
-            final woPh = snapshot['woPh'] ?? 0;
+            final total = (snapshot['total'] ?? 0) as int;
+            final present = (snapshot['present'] ?? 0) as int;
+            final onLeave = (snapshot['onLeave'] ?? 0) as int;
+            final notIn = (snapshot['notIn'] ?? 0) as int;
+            final woPh = (snapshot['woPh'] ?? 0) as int;
+            final presentFrac = total > 0 ? present / total : 0.0;
 
             return PfCard(
               padding: const EdgeInsets.all(16),
@@ -49,8 +52,8 @@ class TeamSnapshotWidget extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              '$total',
+                            AnimatedCount(
+                              target: total.toDouble(),
                               style: AppTextStyles.bigNumber,
                             ),
                             Text('Total org', style: AppTextStyles.caption),
@@ -68,20 +71,25 @@ class TeamSnapshotWidget extends ConsumerWidget {
                               style: AppTextStyles.caption,
                             ),
                             const SizedBox(height: 4),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(999),
-                              child: LinearProgressIndicator(
-                                value: present / total,
-                                backgroundColor: AppColors.surfaceModerate,
-                                valueColor: const AlwaysStoppedAnimation(
-                                  AppColors.positive,
+                            Stack(
+                              children: [
+                                Container(
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceModerate,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
                                 ),
-                                minHeight: 8,
-                              ),
+                                AnimatedBar(
+                                  fraction: presentFrac,
+                                  color: AppColors.positive,
+                                  height: 8,
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '${(present / total * 100).toInt()}% present',
+                              '${(presentFrac * 100).toInt()}% present',
                               style: AppTextStyles.captionMinimal,
                             ),
                           ],
@@ -96,25 +104,25 @@ class TeamSnapshotWidget extends ConsumerWidget {
                     children: [
                       _SnapCell(
                         label: 'Present',
-                        value: present,
+                        value: present.toDouble(),
                         color: AppColors.positive,
                       ),
                       _divider(),
                       _SnapCell(
                         label: 'On leave',
-                        value: onLeave,
+                        value: onLeave.toDouble(),
                         color: AppColors.warning,
                       ),
                       _divider(),
                       _SnapCell(
                         label: 'Not in',
-                        value: notIn,
+                        value: notIn.toDouble(),
                         color: AppColors.negative,
                       ),
                       _divider(),
                       _SnapCell(
                         label: 'WO/PH',
-                        value: woPh,
+                        value: woPh.toDouble(),
                         color: AppColors.contentMinimal,
                       ),
                     ],
@@ -138,7 +146,7 @@ class TeamSnapshotWidget extends ConsumerWidget {
 
 class _SnapCell extends StatelessWidget {
   final String label;
-  final int value;
+  final double value;
   final Color color;
 
   const _SnapCell({
@@ -152,8 +160,8 @@ class _SnapCell extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          Text(
-            '$value',
+          AnimatedCount(
+            target: value,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,

@@ -1,0 +1,90 @@
+/* JDS Tokens - JioBharatIQ MCP (sunit1986/JioBharatIQ_Server) */
+
+@font-face {
+  font-family: 'JioType';
+  font-weight: 400;
+  src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JioType';
+  font-weight: 500;
+  src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JioType';
+  font-weight: 700;
+  src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JioType';
+  font-weight: 900;
+  src: url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Black.woff2') format('woff2');
+}
+
+:root {
+  /* COLORS */
+  --primary-20: #e8e8fc;
+  --primary-50: #3535f3;
+  --primary-60: #000093;
+  --surface-bold: #3900ad;
+  --surface-ghost: #eeeeef;
+  --surface-ghost-icon: #e7e9ff;
+  --surface-minimal: #f5f5f5;
+  --text-high: #141414;
+  --text-low: rgba(25,27,30,0.65);
+  --text-disabled: rgba(25,27,30,0.38);
+  --text-on-bold: #ffffff;
+  --icon-high: #141414;
+  --icon-medium: #170054;
+  --error: #fa2f40;
+  --warning: #f06d0f;
+  --success: #25ab21;
+  --warning-tint: #fff3e6;
+  --error-tint: #fff0f1;
+  --success-tint: #f0faf0;
+  --grey-40: #e0e0e0;
+  --white: #ffffff;
+  --stroke-subtle: rgba(36,38,43,0.12);
+  --stroke-minimal: rgba(36,38,43,0.13);
+
+  /* SPACING */
+  --space-4xs: 2px;
+  --space-3xs: 4px;
+  --space-2xs: 6px;
+  --space-xs: 8px;
+  --space-s: 12px;
+  --space-m: 16px;
+  --space-l: 20px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 40px;
+  --space-huge: 64px;
+
+  /* BORDER RADIUS */
+  --radius-small: 8px;
+  --radius-medium: 12px;
+  --radius-large: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* TYPOGRAPHY */
+  --t-headline-2xs: 20px;
+  --t-headline-3xs: 18px;
+  --t-title-s: 16px;
+  --t-title-2xs: 14px;
+  --t-title-3xs: 13px;
+  --t-body-m: 15px;
+  --t-body-s: 14px;
+  --t-body-xs: 13px;
+  --t-body-2xs: 12px;
+  --t-label-l: 14px;
+  --t-label-m: 13px;
+  --t-label-s: 12px;
+  --t-label-xs: 11px;
+  --t-label-2xs: 10px;
+  --t-label-3xs: 9px;
+
+  /* OPACITY */
+  --opacity-disabled: 0.38;
+  --opacity-enabled: 1;
+}

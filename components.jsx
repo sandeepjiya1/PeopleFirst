@@ -139,9 +139,13 @@ function Dot({ tone = "healthy", size = 8 }) {
 // ─────────────────────────────────────────────────────────────
 // Widget shell — every homepage widget shares this frame
 // ─────────────────────────────────────────────────────────────
+let __wIdx = 0;
 function Widget({ icon, title, action, onAction, children, accent = "var(--content-minimal)", right }) {
+  const idxRef = React.useRef(null);
+  if (idxRef.current === null) idxRef.current = __wIdx++;
+  const delay = `${0.05 + idxRef.current * 0.08}s`;
   return (
-    <section style={{ marginTop: 14 }}>
+    <section style={{ marginTop: 14, animation: `slideUp .45s cubic-bezier(.2,0,0,1) ${delay} both` }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 2px 9px" }}>
         <h2 style={{
           margin: 0, fontSize: 13, fontWeight: 700, letterSpacing: ".02em", textTransform: "uppercase",

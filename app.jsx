@@ -56,7 +56,7 @@ function BottomNav({ items, active, onChange }) {
             <span style={{ position: "relative" }}>
               <Icon name={it.icon} size={23} color={on ? "var(--reliance-base)" : "var(--content-minimal)"} />
               {it.badge > 0 &&
-              <span style={{ position: "absolute", top: -5, right: -9, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: "var(--negative)", color: "#fff", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid var(--surface-minimal)", fontVariantNumeric: "tabular-nums" }}>{it.badge}</span>
+              <span className="nav-badge" style={{ position: "absolute", top: -5, right: -9, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: "var(--negative)", color: "#fff", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "1.5px solid var(--surface-minimal)", fontVariantNumeric: "tabular-nums" }}>{it.badge}</span>
               }
             </span>
             <span style={{ fontSize: 10.5, fontWeight: on ? 700 : 600 }}>{it.label}</span>
@@ -161,6 +161,7 @@ const EMP_TASKS = [
 
 
 function App() {
+  __wIdx = 0;
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const persona = t.persona || "leader";
   const [screen, setScreen] = useState("home");

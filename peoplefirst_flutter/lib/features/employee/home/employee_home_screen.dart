@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../providers/persona_provider.dart';
 import '../../../shared/widgets/app_header.dart';
 import '../../../shared/screens/chat_screen.dart';
+import '../../../shared/widgets/widget_entrance.dart';
 import 'widgets/emp_brief_widget.dart';
 import 'widgets/attendance_widget.dart';
 import 'widgets/quick_links_widget.dart';
@@ -38,21 +39,24 @@ class EmployeeHomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                const EmpBriefWidget(),
+                WidgetEntrance(index: 0, child: const EmpBriefWidget()),
                 const SizedBox(height: 20),
-                AttendanceWidget(
-                  onHistory: () => context.go('/employee/attendance'),
+                WidgetEntrance(
+                  index: 1,
+                  child: AttendanceWidget(
+                    onHistory: () => context.go('/employee/attendance'),
+                  ),
                 ),
                 const SizedBox(height: 20),
-                const QuickLinksWidget(),
+                WidgetEntrance(index: 2, child: const QuickLinksWidget()),
                 const SizedBox(height: 20),
-                const TasksWidget(),
+                WidgetEntrance(index: 3, child: const TasksWidget()),
                 const SizedBox(height: 20),
-                const BookingsEmpWidget(),
+                WidgetEntrance(index: 4, child: const BookingsEmpWidget()),
                 const SizedBox(height: 20),
-                const EmpNewsWidget(),
+                WidgetEntrance(index: 5, child: const EmpNewsWidget()),
                 const SizedBox(height: 20),
-                const RefersCardWidget(),
+                WidgetEntrance(index: 6, child: const RefersCardWidget()),
                 const SizedBox(height: 100),
               ]),
             ),

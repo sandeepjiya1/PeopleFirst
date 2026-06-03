@@ -173,21 +173,33 @@ class _NavBar extends StatelessWidget {
                             Positioned(
                               top: -4,
                               right: -6,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                  vertical: 1,
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                transitionBuilder: (child, anim) =>
+                                    ScaleTransition(
+                                  scale: CurvedAnimation(
+                                    parent: anim,
+                                    curve: Curves.elasticOut,
+                                  ),
+                                  child: child,
                                 ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.badgeRed,
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  '${item.badge}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w700,
+                                child: Container(
+                                  key: ValueKey(item.badge),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 1,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.badgeRed,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    '${item.badge}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ),

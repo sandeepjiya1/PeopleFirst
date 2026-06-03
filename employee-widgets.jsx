@@ -99,11 +99,11 @@ function Attendance({ att, onMark, onOpen }) {
     <Widget icon="time" title="Attendance" action="History" onAction={onOpen}>
       <Card surface="elev" pad={16}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Col label="Mark In" value={inVal} />
+          <div style={{ flex: 1, animation: "fadeIn .4s ease .1s both" }}><Col label="Mark In" value={inVal} /></div>
           <VDiv />
-          <Col label="Mark out" value={outVal} />
+          <div style={{ flex: 1, animation: "fadeIn .4s ease .2s both" }}><Col label="Mark out" value={outVal} /></div>
           <VDiv />
-          <Col label="Duration" value={{ txt: durTxt, color: "var(--content-heavy)" }} />
+          <div style={{ flex: 1, animation: "fadeIn .4s ease .3s both" }}><Col label="Duration" value={{ txt: durTxt, color: "var(--content-heavy)" }} /></div>
         </div>
       </Card>
     </Widget>);
@@ -132,7 +132,8 @@ function QuickLinks({ onGo }) {
             display: "flex", flexDirection: "column", alignItems: "center", gap: 9,
             padding: "16px 6px 15px",
             borderTop: i >= 3 ? "1px solid var(--stroke-minimal)" : "none",
-            borderLeft: i % 3 ? "1px solid var(--stroke-minimal)" : "none"
+            borderLeft: i % 3 ? "1px solid var(--stroke-minimal)" : "none",
+            animation: `fadeInScale .35s ease ${i * 0.06}s both`
           }}>
               <span style={{ width: 46, height: 46, borderRadius: 14, background: l.bg, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Icon name={l.icon} size={23} color={l.fg} />
@@ -165,11 +166,12 @@ function BookingsEmp({ onViewAll }) {
         </button>
       </div>
       <div style={{ display: "flex", gap: 12, overflowX: "auto", padding: "2px 0 6px", scrollSnapType: "x mandatory", textAlign: "left" }}>
-        {items.map((b) =>
+        {items.map((b, i) =>
         <div key={b.tag} style={{
           flex: "0 0 auto", width: 252, scrollSnapAlign: "start",
           background: "var(--surface-minimal)", border: "1px solid var(--stroke-minimal)", borderRadius: 16,
-          boxShadow: "var(--shadow-elevated-low)", padding: 15
+          boxShadow: "var(--shadow-elevated-low)", padding: 15,
+          animation: `slideUp .4s cubic-bezier(.2,0,0,1) ${i * 0.1}s both`
         }}>
             <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
               <span style={{ width: 7, height: 7, borderRadius: 999, background: b.fg, flexShrink: 0 }} />
@@ -230,7 +232,11 @@ function Tasks({ tasks, onToggle, onNew, onOpen }) {
     <Widget icon="list" title="Tasks today" action="All tasks" onAction={onOpen}
     right={<span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--content-moderate)", marginRight: 10, fontVariantNumeric: "tabular-nums" }}>{open.length} open</span>}>
       <Card surface="elev" pad={4}>
-        {show.map((t, i) => <TaskRow key={t.id} t={t} onToggle={onToggle} divider={i > 0} />)}
+        {show.map((t, i) =>
+          <div key={t.id} style={{ animation: `slideUp .35s ease ${i * 0.07}s both` }}>
+            <TaskRow t={t} onToggle={onToggle} divider={i > 0} />
+          </div>
+        )}
         <button onClick={onNew} style={{
           width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
           padding: "12px", borderTop: "1px solid var(--stroke-minimal)", background: "none", border: "none",

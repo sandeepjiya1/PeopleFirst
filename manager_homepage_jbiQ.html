@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=360, initial-scale=1.0, maximum-scale=1.0">
+<title>PeopleFirst - Manager (JioBharatIQ MCP)</title>
+
+<link rel="stylesheet" href="tokens.css">
+
+<style>
+/* SVG fill/stroke color utilities */
+.fill-primary { color: var(--primary-50); }
+.fill-ai      { color: var(--surface-bold); }
+.fill-dark    { color: var(--icon-high); }
+.fill-white-muted { color: rgba(255,255,255,0.75); }
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'JioType', sans-serif;
+  background: var(--white);
+  max-width: 360px;
+  margin: 0 auto;
+  color: var(--text-high);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* UTILITY */
+.gap-m { height: var(--space-m); }
+.gap-s { height: var(--space-xs); }
+.section-wrap { padding: var(--space-m) var(--space-m) 0; }
+
+/* STATUS BAR */
+.status-bar {
+  height: 28px;
+  background: var(--primary-50);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-m);
+}
+.status-bar__time {
+  font-size: var(--t-label-s); font-weight: 700;
+  color: var(--text-on-bold);
+}
+.status-icons { display: flex; align-items: center; gap: var(--space-2xs); }
+.signal-bars { display: flex; align-items: flex-end; gap: var(--space-4xs); height: var(--space-s); }
+.signal-bar { width: 3px; background: rgba(255,255,255,0.75); border-radius: 1px; }
+.battery {
+  width: var(--space-l); height: 10px;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  border-radius: var(--space-4xs);
+  position: relative; display: flex;
+  align-items: center; padding: 1.5px;
+}
+.battery::after {
+  content: ''; position: absolute;
+  right: -4px; top: 50%; transform: translateY(-50%);
+  width: var(--space-4xs); height: 5px;
+  background: rgba(255,255,255,0.5); border-radius: 0 1px 1px 0;
+}
+.battery-fill {
+  height: 100%; width: 75%;
+  background: rgba(255,255,255,0.9); border-radius: 1px;
+}
+
+/* HEADER */
+.header {
+  background: var(--white);
+  height: var(--space-huge); display: flex; align-items: center;
+  padding: 0 var(--space-m); gap: var(--space-xs);
+  border-bottom: 1px solid var(--stroke-subtle);
+}
+.avatar {
+  width: var(--space-3xl); height: var(--space-3xl); border-radius: 50%;
+  background: var(--primary-50);
+  color: var(--text-on-bold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--t-title-2xs); font-weight: 700;
+  flex-shrink: 0; letter-spacing: 0.5px;
+}
+.greeting { flex: 1; }
+.greeting__sub {
+  font-size: var(--t-label-xs); font-weight: 500;
+  color: var(--text-low); line-height: 1.4;
+}
+.greeting__name {
+  font-size: var(--t-headline-3xs); font-weight: 900;
+  color: var(--text-high); letter-spacing: -0.5px; line-height: 1.2;
+}
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface-ghost-icon);
+  border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.icon-btn--notif::after {
+  content: ''; position: absolute;
+  top: var(--space-2xs); right: var(--space-2xs);
+  width: var(--space-xs); height: var(--space-xs);
+  background: var(--error); border-radius: 50%;
+  border: 1.5px solid var(--white);
+}
+
+/* SECTION HEADER */
+.section-hdr {
+  display: flex; align-items: center;
+  gap: var(--space-xs); margin-bottom: var(--space-xs);
+}
+.section-title {
+  font-size: var(--t-title-s); font-weight: 700;
+  color: var(--text-high); letter-spacing: -0.3px;
+}
+.ai-badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  background: var(--surface-ghost-icon);
+  color: var(--surface-bold);
+  font-family: 'JioType', sans-serif;
+  font-size: var(--t-label-xs); font-weight: 700;
+  padding: var(--space-4xs) var(--space-xs); border-radius: var(--radius-pill);
+}
+.section-link {
+  margin-left: auto;
+  font-size: var(--t-label-xs); font-weight: 700;
+  color: var(--primary-50); text-decoration: none;
+}
+
+/* AI MORNING BRIEFING */
+.briefing-card {
+  background: var(--primary-20);
+  border-radius: var(--radius-large);
+  border: 1px solid rgba(53,53,243,0.18);
+  padding: var(--space-s) var(--space-m) var(--space-m);
+  margin: 0 var(--space-m);
+}
+.briefing-eyebrow {
+  display: flex; align-items: center; gap: 5px;
+  margin-bottom: var(--space-3xs);
+}
+.briefing-eyebrow__text {
+  font-size: var(--t-label-3xs); font-weight: 700;
+  color: var(--surface-bold); letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+.briefing-sub {
+  font-size: var(--t-body-2xs); font-weight: 500;
+  color: var(--text-low); margin-bottom: var(--space-s);
+}
+.mini-cards { display: flex; gap: 7px; }
+.mini-card {
+  flex: 1; background: var(--white);
+  border-radius: var(--radius-medium);
+  border: 1px solid var(--stroke-minimal);
+  overflow: hidden; position: relative;
+  padding: var(--space-xs);
+}
+.mini-card__stripe { height: 3px; position: absolute; top: 0; left: 0; right: 0; }
+.mini-card__title {
+  font-size: var(--t-title-3xs); font-weight: 700;
+  color: var(--text-high); line-height: 1.25;
+  margin: var(--space-xs) 0 var(--space-3xs);
+}
+.mini-card__sub {
+  font-size: var(--t-label-2xs); font-weight: 500;
+  color: var(--text-low); line-height: 1.3; margin-bottom: var(--space-xs);
+}
+.mini-card__cta {
+  display: block; width: 100%;
+  font-family: 'JioType', sans-serif;
+  font-size: var(--t-label-2xs); font-weight: 700;
+  text-align: center; padding: var(--space-3xs);
+  border-radius: var(--radius-pill); border: none; cursor: pointer;
+}
+.mini-card__cta--warning { background: var(--warning-tint); color: var(--warning); }
+.mini-card__cta--error   { background: var(--error-tint);   color: var(--error); }
+.mini-card__cta--success { background: var(--success-tint); color: var(--success); }
+
+/* AI SUGGESTION BAR */
+.ai-bar {
+  background: var(--surface-bold);
+  border-radius: var(--radius-pill);
+  padding: var(--space-xs) var(--space-m);
+  margin: 0 var(--space-m);
+  display: flex; align-items: center; gap: var(--space-xs);
+}
+.ai-bar__text { flex: 1; }
+.ai-bar__eyebrow {
+  font-size: var(--t-label-3xs); font-weight: 700;
+  color: rgba(255,255,255,0.65); letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+.ai-bar__title {
+  font-size: var(--t-title-3xs); font-weight: 700;
+  color: var(--text-on-bold);
+}
+.ai-bar__btn {
+  background: var(--white); color: var(--surface-bold);
+  font-family: 'JioType', sans-serif;
+  font-size: var(--t-label-s); font-weight: 700;
+  padding: 7px var(--space-s);
+  border-radius: var(--radius-pill); border: none; cursor: pointer;
+  white-space: nowrap;
+}
+
+/* COUNT CARDS */
+.count-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs); margin: var(--space-xs) var(--space-m) 0;
+}
+.count-card {
+  background: var(--surface-ghost);
+  border-radius: var(--radius-large);
+  padding: var(--space-s) var(--space-m);
+  display: flex; flex-direction: column; gap: var(--space-4xs);
+}
+.count-card__label {
+  font-size: var(--t-label-xs); font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.count-card__num {
+  font-size: 28px; font-weight: 900;
+  letter-spacing: -1px; line-height: 1.1;
+}
+.count-card__sub {
+  font-size: var(--t-label-xs); font-weight: 500; color: var(--text-low);
+}
+
+/* TEAM SNAPSHOT */
+.snapshot-card {
+  background: var(--white);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--stroke-subtle);
+  margin: 0 var(--space-m); overflow: hidden;
+}
+.stat-row { display: grid; grid-template-columns: repeat(4,1fr); }
+.stat-cell {
+  padding: var(--space-xs) var(--space-3xs);
+  text-align: center;
+  border-right: 1px solid var(--stroke-subtle);
+}
+.stat-cell:last-child { border-right: none; }
+.stat-label {
+  font-size: 8px; font-weight: 700;
+  color: var(--text-disabled);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: var(--space-3xs);
+}
+.stat-value {
+  font-size: 22px; font-weight: 900; letter-spacing: -0.5px;
+}
+.snapshot-footer {
+  background: var(--surface-minimal);
+  padding: var(--space-xs) var(--space-m);
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--stroke-subtle);
+}
+.snapshot-footer__stat {
+  font-size: var(--t-label-xs); font-weight: 700; color: var(--success);
+}
+.snapshot-footer__link {
+  font-size: var(--t-label-xs); font-weight: 700;
+  color: var(--primary-50); text-decoration: none;
+}
+
+/* QUICK ACTIONS */
+.quick-card {
+  background: var(--white);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--stroke-subtle);
+  margin: 0 var(--space-m);
+  padding: var(--space-s) var(--space-m);
+}
+.group-label {
+  font-size: var(--t-label-xs); font-weight: 700;
+  color: var(--text-disabled);
+  text-transform: uppercase; letter-spacing: 1.2px;
+  margin-bottom: var(--space-s);
+}
+.icon-row { display: flex; justify-content: space-around; margin-bottom: var(--space-m); }
+.icon-item { display: flex; flex-direction: column; align-items: center; gap: var(--space-2xs); width: 72px; }
+.icon-circle {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--surface-ghost-icon);
+  display: flex; align-items: center; justify-content: center;
+}
+.icon-item__label {
+  font-size: var(--t-label-xs); font-weight: 700;
+  color: var(--text-high); text-align: center; line-height: 1.3;
+}
+.divider { height: 1px; background: var(--stroke-subtle); margin: var(--space-xs) 0; }
+.pill-row { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
+.jds-pill {
+  font-family: 'JioType', sans-serif;
+  font-size: var(--t-label-s); font-weight: 700;
+  padding: var(--space-2xs) var(--space-s); border-radius: var(--radius-pill);
+  background: var(--primary-20); color: var(--primary-50);
+  border: none; cursor: pointer;
+}
+
+/* PERFORMANCE WIDGET */
+.perf-section { padding: 0 var(--space-m); }
+.perf-main-card {
+  background: var(--white);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--stroke-subtle);
+  padding: var(--space-m);
+  overflow: hidden;
+}
+.perf-month-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-s);
+}
+.perf-month-label {
+  font-size: var(--t-label-xs); font-weight: 700;
+  color: var(--text-medium); letter-spacing: 0.5px;
+}
+.perf-nav-btn {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--surface-ghost-icon);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary-50);
+}
+.perf-kpi-row {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 4px;
+}
+.perf-kpi-value {
+  font-size: 34px; font-weight: 900; line-height: 1;
+  color: var(--text-high); letter-spacing: -1px;
+}
+.perf-kpi-value span { font-size: 20px; font-weight: 700; }
+.perf-sparkline { flex-shrink: 0; margin-bottom: 4px; }
+.perf-target-label {
+  font-size: var(--t-label-xs); font-weight: 500;
+  color: var(--text-low); margin-bottom: var(--space-xs);
+}
+.perf-bar-track {
+  height: 7px; background: var(--stroke-subtle);
+  border-radius: var(--radius-pill); overflow: hidden;
+  margin-bottom: var(--space-xs);
+}
+.perf-bar-fill {
+  height: 100%; border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, #E53935, #EF5350);
+  transition: width 0.4s ease;
+}
+.perf-bar-fill--ok { background: linear-gradient(90deg, var(--success), #43A047); }
+.perf-meta-row {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.perf-meta-left {
+  font-size: var(--t-label-xs); font-weight: 700;
+  color: var(--error);
+}
+.perf-meta-left--ok { color: var(--success); }
+.perf-status-pill {
+  font-size: var(--t-label-3xs); font-weight: 700;
+  padding: 4px 12px; border-radius: var(--radius-pill);
+  background: rgba(229,57,53,0.1); color: #E53935;
+  letter-spacing: 0.3px;
+}
+.perf-status-pill--ok { background: rgba(67,160,71,0.1); color: #43A047; }
+
+.perf-kpi-grid {
+  display: flex; gap: var(--space-xs);
+  overflow-x: auto; scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.perf-kpi-grid::-webkit-scrollbar { display: none; }
+.perf-kpi-card {
+  flex: 1; min-width: 110px;
+  background: var(--white);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--stroke-subtle);
+  padding: var(--space-s) var(--space-s) var(--space-xs);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.perf-kpi-card__num {
+  font-size: 26px; font-weight: 900; line-height: 1.1;
+  color: var(--text-high); letter-spacing: -0.5px;
+}
+.perf-kpi-card__num span { font-size: 16px; font-weight: 700; }
+.perf-kpi-card__title {
+  font-size: var(--t-label-xs); font-weight: 700; color: var(--text-high);
+}
+.perf-kpi-card__sub {
+  font-size: var(--t-label-3xs); font-weight: 500; color: var(--text-low);
+  margin-bottom: 6px;
+}
+.perf-kpi-card__delta {
+  font-size: var(--t-label-3xs); font-weight: 700;
+  margin-bottom: 4px;
+}
+.perf-kpi-card__badge {
+  align-self: flex-start;
+  font-size: var(--t-label-3xs); font-weight: 700;
+  padding: 3px 10px; border-radius: var(--radius-pill);
+  letter-spacing: 0.2px;
+}
+.badge--ok { background: rgba(67,160,71,0.12); color: #43A047; }
+.badge--risk { background: rgba(229,57,53,0.1); color: #E53935; }
+.badge--warn { background: rgba(245,158,11,0.12); color: #B45309; }
+
+/* BOOKINGS */
+.bookings-track {
+  display: flex; gap: var(--space-xs);
+  padding: 0 var(--space-m);
+  overflow-x: auto; scrollbar-width: none;
+}
+.bookings-track::-webkit-scrollbar { display: none; }
+.booking-card {
+  min-width: 210px; flex-shrink: 0;
+  background: var(--white);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--stroke-subtle);
+  padding: var(--space-s);
+  display: flex; flex-direction: column; gap: 3px;
+}
+.booking-tag {
+  align-self: flex-start;
+  font-family: 'JioType', sans-serif;
+  font-size: var(--t-label-3xs); font-weight: 700;
+  color: var(--text-on-bold);
+  padding: 3px 10px; border-radius: var(--radius-pill);
+  letter-spacing: 0.4px; text-transform: uppercase;
+  margin-bottom: var(--space-2xs);
+}
+.booking-title {
+  font-size: var(--t-title-3xs); font-weight: 700; color: var(--text-high);
+}
+.booking-sub {
+  font-size: var(--t-label-xs); font-weight: 500; color: var(--text-low);
+  margin-bottom: var(--space-xs);
+}
+.booking-edit {
+  align-self: flex-end;
+  font-family: 'JioType', sans-serif;
+  font-size: var(--t-label-xs); font-weight: 700;
+  color: var(--primary-50); background: var(--primary-20);
+  border: none; border-radius: var(--radius-pill);
+  padding: var(--space-3xs) var(--space-s); cursor: pointer;
+}
+
+/* UPDATES */
+.updates-card {
+  background: var(--white);
+  border-radius: var(--radius-large);
+  border: 1px solid var(--stroke-subtle);
+  margin: 0 var(--space-m); overflow: hidden;
+}
+.update-row {
+  display: flex; align-items: center; gap: var(--space-s);
+  padding: var(--space-s) var(--space-m);
+}
+.update-row + .update-row { border-top: 1px solid var(--stroke-subtle); }
+.update-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface-ghost-icon);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.update-body { flex: 1; }
+.update-title {
+  font-size: var(--t-title-3xs); font-weight: 700;
+  color: var(--text-high); margin-bottom: var(--space-4xs);
+}
+.update-sub {
+  font-size: var(--t-label-xs); font-weight: 500; color: var(--text-low);
+}
+.chevron { font-size: 18px; color: var(--text-disabled); }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  background: var(--white);
+  border-top: 1px solid var(--stroke-subtle);
+  display: flex; height: var(--space-huge);
+  position: sticky; bottom: 0;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: var(--space-4xs); cursor: pointer;
+}
+.nav-icon-pill {
+  width: var(--space-3xl); height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-pill);
+}
+.nav-item--active .nav-icon-pill { background: var(--surface-ghost-icon); }
+.nav-label {
+  font-size: var(--t-label-3xs); font-weight: 700; color: var(--text-low);
+}
+.nav-item--active .nav-label { color: var(--primary-50); }
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span class="status-bar__time">9:41</span>
+  <div class="status-icons">
+    <div class="signal-bars">
+      <div class="signal-bar" style="height:3px;opacity:0.4;"></div>
+      <div class="signal-bar" style="height:var(--space-2xs);opacity:0.55;"></div>
+      <div class="signal-bar" style="height:9px;opacity:0.75;"></div>
+      <div class="signal-bar" style="height:var(--space-s);"></div>
+    </div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="fill-white-muted">
+      <path d="M12 20.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-3.54-3.04a5 5 0 017.08 0M5.64 12.64a10 10 0 0112.72 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <div class="battery"><div class="battery-fill"></div></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="avatar">SS</div>
+  <div class="greeting">
+    <div class="greeting__sub">Good morning,</div>
+    <div class="greeting__name">Sandeep!</div>
+  </div>
+  <button class="icon-btn fill-primary" aria-label="Search">
+    <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+      <path d="M10.004 2a7 7 0 015.6 11.19l6.11 6.1a1.002 1.002 0 01-1.42 1.42l-6.1-6.11A7 7 0 1110.004 2zm0 12a5 5 0 100-10 5 5 0 000 10z" fill="currentColor"/>
+    </svg>
+  </button>
+  <button class="icon-btn icon-btn--notif fill-primary" aria-label="Notifications">
+    <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+      <path d="M12 3a7 7 0 00-7 7v3.5L3.5 16h17L19 13.5V10a7 7 0 00-7-7zm-2 15a2 2 0 004 0" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</header>
+
+<!-- AI MORNING BRIEFING -->
+<div class="gap-m"></div>
+<div class="section-wrap">
+  <div class="section-hdr">
+    <span class="section-title">AI Morning Briefing</span>
+    <span class="ai-badge">
+      <svg viewBox="0 0 12 12" width="9" height="9" class="fill-ai"><path d="M6 0L7.3 4.7L12 6L7.3 7.3L6 12L4.7 7.3L0 6L4.7 4.7Z" fill="currentColor"/></svg>
+      AI
+    </span>
+  </div>
+</div>
+<div class="briefing-card">
+  <div class="briefing-eyebrow">
+    <svg viewBox="0 0 12 12" width="9" height="9" class="fill-ai"><path d="M6 0L7.3 4.7L12 6L7.3 7.3L6 12L4.7 7.3L0 6L4.7 4.7Z" fill="currentColor"/></svg>
+    <span class="briefing-eyebrow__text">Top decisions for today</span>
+  </div>
+  <div class="briefing-sub">3 items need your attention before 10 AM</div>
+  <div class="mini-cards">
+    <div class="mini-card">
+      <div class="mini-card__stripe" style="background:var(--warning);"></div>
+      <div class="mini-card__title">Leave backlog</div>
+      <div class="mini-card__sub">5 pending</div>
+      <button class="mini-card__cta mini-card__cta--warning">Review</button>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card__stripe" style="background:var(--error);"></div>
+      <div class="mini-card__title">Team gap</div>
+      <div class="mini-card__sub">2 not reported</div>
+      <button class="mini-card__cta mini-card__cta--error">Act now</button>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card__stripe" style="background:var(--success);"></div>
+      <div class="mini-card__title">Budget OK</div>
+      <div class="mini-card__sub">-8% vs plan</div>
+      <button class="mini-card__cta mini-card__cta--success">View</button>
+    </div>
+  </div>
+</div>
+
+<!-- MY APPROVALS -->
+<div class="gap-m"></div>
+<div class="section-wrap">
+  <div class="section-hdr">
+    <span class="section-title">My Approvals</span>
+    <span class="ai-badge">
+      <svg viewBox="0 0 12 12" width="9" height="9" class="fill-ai"><path d="M6 0L7.3 4.7L12 6L7.3 7.3L6 12L4.7 7.3L0 6L4.7 4.7Z" fill="currentColor"/></svg>
+      AI
+    </span>
+  </div>
+</div>
+<div class="ai-bar">
+  <svg viewBox="0 0 12 12" width="14" height="14" style="flex-shrink:0;color:rgba(255,255,255,0.7);">
+    <path d="M6 0L7.3 4.7L12 6L7.3 7.3L6 12L4.7 7.3L0 6L4.7 4.7Z" fill="currentColor"/>
+  </svg>
+  <div class="ai-bar__text">
+    <div class="ai-bar__eyebrow">AI Suggestion</div>
+    <div class="ai-bar__title">Approve 6 routine items</div>
+  </div>
+  <button class="ai-bar__btn">Approve</button>
+</div>
+<div class="count-grid">
+  <div class="count-card">
+    <div class="count-card__label" style="color:var(--warning);">Leave</div>
+    <div class="count-card__num" style="color:var(--warning);">5</div>
+    <div class="count-card__sub">Pending approvals</div>
+  </div>
+  <div class="count-card">
+    <div class="count-card__label" style="color:var(--error);">Attendance</div>
+    <div class="count-card__num" style="color:var(--error);">1</div>
+    <div class="count-card__sub">Regularisation</div>
+  </div>
+</div>
+
+<!-- TEAM SNAPSHOT -->
+<div class="gap-m"></div>
+<div class="section-wrap">
+  <div class="section-hdr">
+    <span class="section-title">Team Snapshot</span>
+    <span class="ai-badge">
+      <svg viewBox="0 0 12 12" width="9" height="9" class="fill-ai"><path d="M6 0L7.3 4.7L12 6L7.3 7.3L6 12L4.7 7.3L0 6L4.7 4.7Z" fill="currentColor"/></svg>
+      AI
+    </span>
+  </div>
+</div>
+<div class="snapshot-card">
+  <div class="stat-row">
+    <div class="stat-cell">
+      <div class="stat-label">Headcount</div>
+      <div class="stat-value" style="color:var(--text-high);">9</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Available</div>
+      <div class="stat-value" style="color:var(--success);">7</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Not Rptd</div>
+      <div class="stat-value" style="color:var(--error);">2</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">On Leave</div>
+      <div class="stat-value" style="color:var(--text-disabled);">0</div>
+    </div>
+  </div>
+  <div class="snapshot-footer">
+    <span class="snapshot-footer__stat">77.8% available today</span>
+    <a href="#" class="snapshot-footer__link">Drill in</a>
+  </div>
+</div>
+
+<!-- PERFORMANCE -->
+<div class="gap-m"></div>
+<div class="section-wrap">
+  <div class="section-hdr">
+    <span class="section-title">Performance</span>
+    <span class="ai-badge">
+      <svg viewBox="0 0 12 12" width="9" height="9" class="fill-ai"><path d="M6 0L7.3 4.7L12 6L7.3 7.3L6 12L4.7 7.3L0 6L4.7 4.7Z" fill="currentColor"/></svg>
+      AI
+    </span>
+    <a href="#" class="section-link">Full report</a>
+  </div>
+  <div class="perf-main-card" style="margin-top:var(--space-xs);">
+    <div class="perf-month-nav">
+      <button class="perf-nav-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="perf-month-label">MAY 2026</span>
+      <button class="perf-nav-btn">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div style="flex:1;"></div>
+      <span style="font-size:var(--t-label-3xs);font-weight:600;color:var(--text-low);">Monthly Sales</span>
+    </div>
+    <div class="perf-kpi-row">
+      <div class="perf-kpi-value">₹8.6<span>L</span></div>
+      <!-- Sparkline SVG -->
+      <svg class="perf-sparkline" width="72" height="32" viewBox="0 0 72 32" fill="none">
+        <polyline points="0,28 12,22 24,25 36,16 48,20 60,10 72,14" stroke="#E53935" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+        <polyline points="0,28 12,22 24,25 36,16 48,20 60,10 72,14 72,32 0,32" fill="rgba(229,57,53,0.08)" stroke="none"/>
+        <circle cx="72" cy="14" r="3" fill="#E53935"/>
+      </svg>
+    </div>
+    <div class="perf-target-label">of ₹15,00,000 monthly target</div>
+    <div class="perf-bar-track">
+      <div class="perf-bar-fill" style="width:68.3%;"></div>
+    </div>
+    <div class="perf-meta-row">
+      <span class="perf-meta-left">68.3% &nbsp;·&nbsp; 12 days left</span>
+      <span class="perf-status-pill">Under Risk</span>
+    </div>
+  </div>
+</div>
+
+<div class="gap-s"></div>
+<div class="perf-section">
+  <div class="perf-kpi-grid">
+    <!-- Active Deals -->
+    <div class="perf-kpi-card">
+      <div class="perf-kpi-card__num">24</div>
+      <div class="perf-kpi-card__title">Active deals</div>
+      <div class="perf-kpi-card__sub">of 30 target</div>
+      <div class="perf-kpi-card__delta" style="color:var(--success);">↑ 4 this week</div>
+      <span class="perf-kpi-card__badge badge--ok">On track</span>
+    </div>
+    <!-- Cash Burn -->
+    <div class="perf-kpi-card">
+      <div class="perf-kpi-card__num">₹4.8<span>L</span></div>
+      <div class="perf-kpi-card__title">Cash burn</div>
+      <div class="perf-kpi-card__sub">vs ₹4.0L plan</div>
+      <div class="perf-kpi-card__delta" style="color:var(--error);">↑ 18% vs plan</div>
+      <span class="perf-kpi-card__badge badge--risk">Off track</span>
+    </div>
+    <!-- Pipeline -->
+    <div class="perf-kpi-card">
+      <div class="perf-kpi-card__num">₹22<span>L</span></div>
+      <div class="perf-kpi-card__title">Pipeline</div>
+      <div class="perf-kpi-card__sub">next 30 days</div>
+      <div class="perf-kpi-card__delta" style="color:var(--success);">↑ 12% vs last mo</div>
+      <span class="perf-kpi-card__badge badge--ok">Healthy</span>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK ACTIONS -->
+<div class="gap-m"></div>
+<div class="section-wrap">
+  <div class="section-hdr">
+    <span class="section-title">Quick Actions</span>
+  </div>
+</div>
+<div class="quick-card">
+  <div class="group-label">My Team</div>
+  <div class="icon-row">
+    <div class="icon-item">
+      <div class="icon-circle">
+        <svg viewBox="0 0 24 24" fill="none" width="22" height="22" class="fill-primary">
+          <path d="M20 8V6a3 3 0 00-3-3h-1.28A2 2 0 0014 2h-4a2 2 0 00-1.72 1H7a3 3 0 00-3 3v13a3 3 0 003 3h10a3 3 0 003-3v-1a2 2 0 002-2v-6a2 2 0 00-2-2zm-2 11a1 1 0 01-1 1H7a1 1 0 01-1-1V6a1 1 0 011-1h1.28A2 2 0 0010 6h4a2 2 0 001.72-1H17a1 1 0 011 1v2h-6a2 2 0 00-2 2v6a2 2 0 002 2h6v1zm.71-6.79l-3 3a1.002 1.002 0 01-1.42 0l-1-1a1.004 1.004 0 111.42-1.42l.29.3 2.29-2.3a1.004 1.004 0 111.42 1.42z" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="icon-item__label">Approvals</span>
+    </div>
+    <div class="icon-item">
+      <div class="icon-circle">
+        <svg viewBox="0 0 24 24" fill="none" width="22" height="22" class="fill-primary">
+          <path d="M18 3h-1a1 1 0 00-2 0H9a1 1 0 00-2 0H6a3 3 0 00-3 3v12a3 3 0 003 3h12a3 3 0 003-3V6a3 3 0 00-3-3zm-1.79 8.71l-5 5a1.002 1.002 0 01-1.42 0l-2-2a1.003 1.003 0 111.42-1.42l1.29 1.3 4.29-4.3a1.004 1.004 0 011.42 1.42zM19 7H5V6a1 1 0 011-1h1a1 1 0 002 0h6a1 1 0 002 0h1a1 1 0 011 1v1z" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="icon-item__label">Recruitment</span>
+    </div>
+    <div class="icon-item">
+      <div class="icon-circle">
+        <svg viewBox="0 0 24 24" fill="none" width="22" height="22" class="fill-primary">
+          <path d="M20.12 3.88A3 3 0 0018 3h-1a1 1 0 00-2 0H9a1 1 0 00-2 0H6a3 3 0 00-3 3v12a3 3 0 003 3h12a3 3 0 003-3V6a3 3 0 00-.88-2.12zM8 17a1 1 0 110-2 1 1 0 010 2zm0-4a1 1 0 110-2 1 1 0 010 2zm4 4a1 1 0 110-2 1 1 0 010 2zm0-4a1 1 0 110-2 1 1 0 010 2zm4 0a1 1 0 110-2 1 1 0 010 2zm3-6H5V6a1 1 0 011-1h1a1 1 0 002 0h6a1 1 0 002 0h1a1 1 0 011 1v1z" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="icon-item__label">Team Report</span>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="group-label">My Benefits</div>
+  <div class="pill-row">
+    <button class="jds-pill">Payslip</button>
+    <button class="jds-pill">Leave</button>
+    <button class="jds-pill">ESS</button>
+    <button class="jds-pill">HRMS</button>
+  </div>
+</div>
+
+<!-- UPCOMING BOOKINGS -->
+<div class="gap-m"></div>
+<div class="section-wrap">
+  <div class="section-hdr">
+    <span class="section-title">Upcoming Bookings</span>
+    <span class="ai-badge">
+      <svg viewBox="0 0 12 12" width="9" height="9" class="fill-ai"><path d="M6 0L7.3 4.7L12 6L7.3 7.3L6 12L4.7 7.3L0 6L4.7 4.7Z" fill="currentColor"/></svg>
+      AI
+    </span>
+    <a href="#" class="section-link">View all (3)</a>
+  </div>
+</div>
+<div class="bookings-track">
+  <div class="booking-card">
+    <span class="booking-tag" style="background:var(--success);">GYM SESSION</span>
+    <div class="booking-title">Today, 8:00 PM</div>
+    <div class="booking-sub">Building 4A, Ground Floor</div>
+    <button class="booking-edit">Edit</button>
+  </div>
+  <div class="booking-card">
+    <span class="booking-tag" style="background:var(--warning);">LEAVE REVIEW</span>
+    <div class="booking-title">Tue, 11:00 AM</div>
+    <div class="booking-sub">3 pending, 10 mins</div>
+    <button class="booking-edit">Edit</button>
+  </div>
+  <div class="booking-card">
+    <span class="booking-tag" style="background:var(--primary-50);">TEAM SYNC</span>
+    <div class="booking-title">Wed, 3:00 PM</div>
+    <div class="booking-sub">Zoom, Sprint retro</div>
+    <button class="booking-edit">Edit</button>
+  </div>
+</div>
+
+<!-- UPDATES -->
+<div class="gap-m"></div>
+<div class="section-wrap">
+  <div class="section-hdr">
+    <span class="section-title">Updates</span>
+    <a href="#" class="section-link">Show all</a>
+  </div>
+</div>
+<div class="updates-card">
+  <div class="update-row">
+    <div class="update-icon">
+      <svg viewBox="0 0 24 24" fill="none" width="18" height="18" class="fill-primary">
+        <path d="M20 8V6a3 3 0 00-3-3h-1.28A2 2 0 0014 2h-4a2 2 0 00-1.72 1H7a3 3 0 00-3 3v13a3 3 0 003 3h10a3 3 0 003-3v-1a2 2 0 002-2v-6a2 2 0 00-2-2zm-2 11a1 1 0 01-1 1H7a1 1 0 01-1-1V6a1 1 0 011-1h1.28A2 2 0 0010 6h4a2 2 0 001.72-1H17a1 1 0 011 1v2h-6a2 2 0 00-2 2v6a2 2 0 002 2h6v1zm.71-6.79l-3 3a1.002 1.002 0 01-1.42 0l-1-1a1.004 1.004 0 111.42-1.42l.29.3 2.29-2.3a1.004 1.004 0 111.42 1.42z" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="update-body">
+      <div class="update-title">3 new announcements</div>
+      <div class="update-sub">Travel policy update, effective 1 June</div>
+    </div>
+    <span class="chevron">&#8250;</span>
+  </div>
+  <div class="update-row">
+    <div class="update-icon">
+      <svg viewBox="0 0 24 24" fill="none" width="18" height="18" class="fill-primary">
+        <path d="M18 3h-1a1 1 0 00-2 0H9a1 1 0 00-2 0H6a3 3 0 00-3 3v12a3 3 0 003 3h12a3 3 0 003-3V6a3 3 0 00-3-3zm-1.79 8.71l-5 5a1.002 1.002 0 01-1.42 0l-2-2a1.003 1.003 0 111.42-1.42l1.29 1.3 4.29-4.3a1.004 1.004 0 011.42 1.42zM19 7H5V6a1 1 0 011-1h1a1 1 0 002 0h6a1 1 0 002 0h1a1 1 0 011 1v1z" fill="currentColor"/>
+      </svg>
+    </div>
+    <div class="update-body">
+      <div class="update-title">Birthdays this week</div>
+      <div class="update-sub">5 colleagues, send wishes</div>
+    </div>
+    <span class="chevron">&#8250;</span>
+  </div>
+</div>
+
+<div class="gap-m"></div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" role="navigation" aria-label="Primary navigation">
+  <div class="nav-item nav-item--active">
+    <div class="nav-icon-pill">
+      <img src="https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/icons/svg/ic_home.svg" width="22" height="22" alt="Home">
+    </div>
+    <span class="nav-label">Home</span>
+  </div>
+  <div class="nav-item">
+    <div class="nav-icon-pill">
+      <svg viewBox="0 0 24 24" fill="none" width="22" height="22" class="fill-dark" style="opacity:var(--opacity-disabled);">
+        <path d="M20.12 3.88A3 3 0 0018 3h-1a1 1 0 00-2 0H9a1 1 0 00-2 0H6a3 3 0 00-3 3v12a3 3 0 003 3h12a3 3 0 003-3V6a3 3 0 00-.88-2.12zM8 17a1 1 0 110-2 1 1 0 010 2zm0-4a1 1 0 110-2 1 1 0 010 2zm4 4a1 1 0 110-2 1 1 0 010 2zm0-4a1 1 0 110-2 1 1 0 010 2zm4 0a1 1 0 110-2 1 1 0 010 2zm3-6H5V6a1 1 0 011-1h1a1 1 0 002 0h6a1 1 0 002 0h1a1 1 0 011 1v1z" fill="currentColor"/>
+      </svg>
+    </div>
+    <span class="nav-label">Attendance</span>
+  </div>
+  <div class="nav-item">
+    <div class="nav-icon-pill">
+      <svg viewBox="0 0 24 24" fill="none" width="22" height="22" class="fill-dark" style="opacity:var(--opacity-disabled);">
+        <path d="M20 8V6a3 3 0 00-3-3h-1.28A2 2 0 0014 2h-4a2 2 0 00-1.72 1H7a3 3 0 00-3 3v13a3 3 0 003 3h10a3 3 0 003-3v-1a2 2 0 002-2v-6a2 2 0 00-2-2zm-2 11a1 1 0 01-1 1H7a1 1 0 01-1-1V6a1 1 0 011-1h1.28A2 2 0 0010 6h4a2 2 0 001.72-1H17a1 1 0 011 1v2h-6a2 2 0 00-2 2v6a2 2 0 002 2h6v1zm.71-6.79l-3 3a1.002 1.002 0 01-1.42 0l-1-1a1.004 1.004 0 111.42-1.42l.29.3 2.29-2.3a1.004 1.004 0 111.42 1.42z" fill="currentColor"/>
+      </svg>
+    </div>
+    <span class="nav-label">Approvals</span>
+  </div>
+  <div class="nav-item">
+    <div class="nav-icon-pill">
+      <svg viewBox="0 0 24 24" fill="none" width="22" height="22" class="fill-dark" style="opacity:var(--opacity-disabled);">
+        <path d="M10.004 2a7 7 0 015.6 11.19l6.11 6.1a1.002 1.002 0 01-1.42 1.42l-6.1-6.11A7 7 0 1110.004 2zm0 12a5 5 0 100-10 5 5 0 000 10z" fill="currentColor"/>
+      </svg>
+    </div>
+    <span class="nav-label">Reports</span>
+  </div>
+  <div class="nav-item">
+    <div class="nav-icon-pill">
+      <svg viewBox="0 0 24 24" fill="none" width="22" height="22" class="fill-dark" style="opacity:var(--opacity-disabled);">
+        <path d="M4 7h16a1 1 0 100-2H4a1 1 0 000 2zm16 10H4a1 1 0 000 2h16a1 1 0 000-2zm0-6H4a1 1 0 000 2h16a1 1 0 000-2z" fill="currentColor"/>
+      </svg>
+    </div>
+    <span class="nav-label">More</span>
+  </div>
+</nav>
+
+</body>
+</html>

@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PeopleFirst — Leader Homepage Design Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B1A2E;
+    --navy2: #0F2340;
+    --jio: #1A4DB5;
+    --jio-light: #E8EEFB;
+    --orange: #FF7A1A;
+    --orange-light: #FFF0E6;
+    --green: #2C9B52;
+    --green-light: #E8F6ED;
+    --amber: #E89B2A;
+    --amber-light: #FDF3E3;
+    --red: #D6342C;
+    --red-light: #FDECEA;
+    --purple: #6F5AE8;
+    --purple-light: #EDF0FB;
+    --ink: #0B1320;
+    --muted: #5A6478;
+    --subtle: #8C95A4;
+    --border: #E4E6EA;
+    --bg: #F4F5F8;
+    --white: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: var(--navy);
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-logo .brand { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 2px; margin-bottom: 4px; }
+  .sidebar-logo .title { font-size: 16px; font-weight: 800; color: white; line-height: 1.3; }
+  .sidebar-logo .sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 6px; }
+  .sidebar-score {
+    margin: 16px 24px;
+    background: rgba(44,155,82,0.15);
+    border: 1px solid rgba(44,155,82,0.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .sidebar-score .num { font-size: 22px; font-weight: 900; color: var(--green); }
+  .sidebar-score .label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+  .sidebar-score .tag { font-size: 12px; font-weight: 600; color: var(--green); }
+  .nav-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.3); letter-spacing: 1.5px; padding: 16px 24px 8px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 24px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); }
+  .nav-item.active { background: rgba(26,77,181,0.25); border-left-color: var(--jio); }
+  .nav-item .n { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.3); width: 18px; }
+  .nav-item .t { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7); }
+  .nav-item .dot { width: 6px; height: 6px; border-radius: 3px; margin-left: auto; flex-shrink: 0; }
+  .sidebar-footer { margin-top: auto; padding: 20px 24px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 11px; color: rgba(255,255,255,0.25); }
+
+  /* ── Main ── */
+  .main { margin-left: 260px; flex: 1; }
+
+  /* ── Hero ── */
+  .hero {
+    background: var(--navy);
+    padding: 64px 64px 56px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: 40%;
+    background: linear-gradient(135deg, rgba(26,77,181,0.15) 0%, transparent 60%);
+  }
+  .hero-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,120,26,0.15); border: 1px solid rgba(255,120,26,0.3); border-radius: 20px; padding: 5px 12px; margin-bottom: 20px; }
+  .hero-tag span { font-size: 11px; font-weight: 700; color: var(--orange); letter-spacing: 1.5px; }
+  .hero h1 { font-size: 48px; font-weight: 900; color: white; line-height: 1.1; letter-spacing: -1.5px; max-width: 600px; margin-bottom: 16px; }
+  .hero h1 em { color: var(--orange); font-style: normal; }
+  .hero p { font-size: 16px; color: rgba(255,255,255,0.55); line-height: 1.6; max-width: 520px; margin-bottom: 32px; }
+  .hero-stats { display: flex; gap: 32px; }
+  .hero-stat .val { font-size: 24px; font-weight: 800; color: white; }
+  .hero-stat .lbl { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+  /* ── Section cards ── */
+  .section-card {
+    margin: 32px 48px;
+    background: white;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .section-header {
+    display: flex; align-items: flex-start; gap: 20px;
+    padding: 28px 32px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-size: 48px; font-weight: 900; color: var(--bg); line-height: 1;
+    min-width: 52px; padding-top: 4px;
+    background: linear-gradient(135deg, #E8EEFB, #F4F5F8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .section-meta { flex: 1; }
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    border-radius: 20px; padding: 3px 10px; margin-bottom: 8px;
+    font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  }
+  .section-title { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.3px; margin-bottom: 4px; }
+  .section-sub { font-size: 13px; color: var(--muted); }
+  .section-body { display: flex; gap: 0; }
+
+  /* ── Phone mockup ── */
+  .mockup-col {
+    width: 280px; min-width: 280px;
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    padding: 24px 20px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .phone-label { font-size: 10px; font-weight: 700; color: var(--subtle); letter-spacing: 1.5px; margin-bottom: 12px; }
+  .mockup-frame {
+    width: 220px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+
+  /* ── Explanation col ── */
+  .explain-col { flex: 1; padding: 28px 32px; }
+  .explain-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .explain-box { background: var(--bg); border-radius: 12px; padding: 16px 18px; }
+  .explain-box .box-label { font-size: 10px; font-weight: 700; color: var(--subtle); letter-spacing: 1.2px; margin-bottom: 8px; }
+  .explain-box .box-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .explain-box .box-body strong { color: var(--ink); }
+  .explain-box.full { grid-column: 1 / -1; }
+  .insight-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .insight-chip { font-size: 11px; font-weight: 600; border-radius: 20px; padding: 3px 10px; }
+
+  /* ── UI Mockup components ── */
+  .mock-section { padding: 10px 12px; border-bottom: 1px solid #F0F2F5; }
+  .mock-section:last-child { border-bottom: none; }
+  .mock-label { font-size: 8px; font-weight: 700; color: var(--subtle); letter-spacing: 1px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .mock-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .mock-big { font-size: 22px; font-weight: 900; color: var(--ink); letter-spacing: -0.5px; }
+  .mock-text { font-size: 10px; color: var(--ink); font-weight: 600; }
+  .mock-sub { font-size: 9px; color: var(--muted); }
+  .mock-pill { font-size: 8px; font-weight: 700; border-radius: 10px; padding: 2px 7px; }
+  .pill-green { background: var(--green-light); color: var(--green); }
+  .pill-amber { background: var(--amber-light); color: var(--amber); }
+  .pill-red { background: var(--red-light); color: var(--red); }
+  .pill-jio { background: var(--jio-light); color: var(--jio); }
+  .mock-stat-row { display: flex; gap: 0; }
+  .mock-stat { flex: 1; text-align: center; padding: 6px 4px; }
+  .mock-stat .sv { font-size: 14px; font-weight: 800; }
+  .mock-stat .sl { font-size: 7px; color: var(--subtle); margin-top: 1px; font-weight: 600; }
+  .mock-metric-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+  .mock-metric-label { font-size: 9px; color: var(--ink); }
+  .mock-metric-val { font-size: 9px; color: var(--muted); }
+  .mock-metric-accent { width: 3px; height: 16px; border-radius: 1.5px; margin-right: 6px; flex-shrink: 0; }
+  .mock-btn { font-size: 8px; font-weight: 700; border-radius: 14px; padding: 5px 10px; border: none; cursor: default; }
+  .mock-btn-primary { background: var(--jio); color: white; }
+  .mock-btn-outline { background: white; color: var(--ink); border: 1px solid var(--border); }
+  .mock-chip-tag { font-size: 7px; font-weight: 700; border-radius: 8px; padding: 2px 6px; }
+  .mock-chip-action { background: var(--amber-light); color: var(--amber); }
+  .mock-chip-fyi { background: #F0F2F5; color: var(--subtle); }
+  .progress-bar { background: #EEF0F3; border-radius: 4px; height: 5px; margin: 4px 0; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; }
+
+  /* ── Section-specific mockup styles ── */
+  .ai-card { background: #EBF4FF; border-radius: 10px; padding: 10px; margin-bottom: 6px; }
+  .ai-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .ai-icon { width: 20px; height: 20px; background: var(--jio); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+  .ai-title { font-size: 9px; font-weight: 700; color: var(--ink); }
+  .ai-sub { font-size: 8px; color: var(--muted); }
+  .ai-body { font-size: 9px; font-weight: 700; color: var(--ink); line-height: 1.4; margin-bottom: 8px; }
+  .ai-body span { color: var(--jio); }
+  .ai-decision { background: white; border-radius: 8px; padding: 8px; margin-bottom: 6px; border-left: 3px solid; }
+  .ad-title { font-size: 9px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+  .ad-sub { font-size: 8px; color: var(--muted); line-height: 1.3; margin-bottom: 6px; }
+  .ad-btns { display: flex; gap: 5px; }
+  .verdict-bar { background: var(--green-light); border-left: 3px solid var(--green); border-radius: 6px; padding: 6px 8px; margin-bottom: 6px; font-size: 8px; color: #1a6b35; font-weight: 600; }
+  .count-tile { background: var(--bg); border-radius: 8px; flex: 1; padding: 6px 5px; text-align: center; }
+  .count-tile .ct-num { font-size: 14px; font-weight: 800; }
+  .count-tile .ct-lbl { font-size: 7px; color: var(--muted); font-weight: 600; }
+
+  /* ── Improve journey ── */
+  .journey-section {
+    margin: 32px 48px;
+    background: var(--navy);
+    border-radius: 20px;
+    padding: 40px;
+    color: white;
+  }
+  .journey-title { font-size: 28px; font-weight: 900; color: white; margin-bottom: 6px; }
+  .journey-sub { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 32px; }
+  .journey-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .journey-step { background: rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); }
+  .js-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 1.2px; margin-bottom: 10px; }
+  .js-score { font-size: 36px; font-weight: 900; margin-bottom: 6px; }
+  .js-title { font-size: 14px; font-weight: 700; color: white; margin-bottom: 8px; }
+  .js-list { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.7; }
+  .js-arrow { display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--orange); }
+
+  /* ── Footer ── */
+  .footer { margin: 0 48px 48px; padding: 24px 32px; background: white; border-radius: 16px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .footer-left .ft { font-size: 14px; font-weight: 700; color: var(--ink); }
+  .footer-left .fs { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .footer-right { font-size: 11px; color: var(--subtle); }
+
+  /* Color tags */
+  .tag-ai { background: var(--purple-light); color: var(--purple); }
+  .tag-perf { background: var(--jio-light); color: var(--jio); }
+  .tag-budget { background: var(--amber-light); color: var(--amber); }
+  .tag-action { background: var(--red-light); color: var(--red); }
+  .tag-team { background: var(--green-light); color: var(--green); }
+  .tag-recruit { background: var(--jio-light); color: var(--jio); }
+  .tag-nav { background: #F0F2F5; color: var(--muted); }
+  .tag-info { background: #F0F2F5; color: var(--muted); }
+
+  @media(max-width:1100px){
+    .explain-grid{grid-template-columns:1fr;}
+    .section-body{flex-direction:column;}
+    .mockup-col{width:100%;border-right:none;border-bottom:1px solid var(--border);}
+  }
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">PEOPLEFIRST</div>
+    <div class="title">Leader Homepage<br>Design Guide</div>
+    <div class="sub">Vikram · Leadership Persona</div>
+  </div>
+  <div class="sidebar-score">
+    <div>
+      <div class="num">8.5</div>
+    </div>
+    <div>
+      <div class="label">UX SCORE / 10</div>
+      <div class="tag">EXCELLENT</div>
+    </div>
+  </div>
+  <div class="nav-label">SECTIONS</div>
+  <a class="nav-item" href="#s1">
+    <span class="n">01</span><span class="t">AI Morning Briefing</span>
+    <span class="dot" style="background:var(--purple)"></span>
+  </a>
+  <a class="nav-item" href="#s2">
+    <span class="n">02</span><span class="t">Performance</span>
+    <span class="dot" style="background:var(--jio)"></span>
+  </a>
+  <a class="nav-item" href="#s3">
+    <span class="n">03</span><span class="t">Expense &amp; Budget</span>
+    <span class="dot" style="background:var(--amber)"></span>
+  </a>
+  <a class="nav-item" href="#s4">
+    <span class="n">04</span><span class="t">Action Items</span>
+    <span class="dot" style="background:var(--red)"></span>
+  </a>
+  <a class="nav-item" href="#s5">
+    <span class="n">05</span><span class="t">Team Today</span>
+    <span class="dot" style="background:var(--green)"></span>
+  </a>
+  <a class="nav-item" href="#s6">
+    <span class="n">06</span><span class="t">Recruitment</span>
+    <span class="dot" style="background:var(--jio)"></span>
+  </a>
+  <a class="nav-item" href="#s7">
+    <span class="n">07</span><span class="t">Upcoming Events</span>
+    <span class="dot" style="background:var(--orange)"></span>
+  </a>
+  <a class="nav-item" href="#s8">
+    <span class="n">08</span><span class="t">Worth Knowing</span>
+    <span class="dot" style="background:var(--amber)"></span>
+  </a>
+  <a class="nav-item" href="#s9">
+    <span class="n">09</span><span class="t">Bottom Navigation</span>
+    <span class="dot" style="background:var(--subtle)"></span>
+  </a>
+  <div class="nav-label">OVERVIEW</div>
+  <a class="nav-item" href="#journey">
+    <span class="n">★</span><span class="t">Design Journey</span>
+  </a>
+  <div class="sidebar-footer">PeopleFirst UX Audit · Jun 2026<br>Score: 7.5 → 8.5 / 10</div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag"><span>LEADERSHIP PERSONA · VIKRAM</span></div>
+    <h1>Leader Homepage<br><em>Design Explainer</em></h1>
+    <p>A section-by-section breakdown of every component on Vikram's mobile homepage — what it shows, why it's there, and how it supports leadership decision-making.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="val">9</div><div class="lbl">Sections explained</div></div>
+      <div class="hero-stat"><div class="val">8.5</div><div class="lbl">UX Score / 10</div></div>
+      <div class="hero-stat"><div class="val">6</div><div class="lbl">Fixes applied</div></div>
+      <div class="hero-stat"><div class="val">2,841 px</div><div class="lbl">Total frame height</div></div>
+    </div>
+  </section>
+
+  <!-- ── S1: AI MORNING BRIEFING ── -->
+  <div class="section-card" id="s1">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div class="section-meta">
+        <div class="section-tag tag-ai">✦ AI-POWERED · DECISION SUPPORT</div>
+        <div class="section-title">PeopleFirst AI Morning Briefing</div>
+        <div class="section-sub">Top of screen · Always first · Updated every morning at 8:47am</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="mockup-col">
+        <div class="phone-label">MOCKUP PREVIEW</div>
+        <div class="mockup-frame">
+          <div class="mock-section" style="padding:10px;">
+            <div class="ai-card">
+              <div class="ai-header">
+                <div class="ai-icon">✦</div>
+                <div>
+                  <div class="ai-title">PeopleFirst AI</div>
+                  <div class="ai-sub">Overnight brief · updated 8:47am</div>
+                </div>
+              </div>
+              <div class="ai-body">I scanned 6 systems overnight. <span>37 items handled.</span> 2 need your decision today.</div>
+              <div class="ai-decision" style="border-color:var(--red)">
+                <div class="ad-title">⬤ Platform pipeline slipped 8% this week.</div>
+                <div class="ad-sub">Two sprints behind on the payments rewrite. Moving one engineer from Growth recovers the date.</div>
+                <div class="ad-btns">
+                  <button class="mock-btn mock-btn-primary">Approve reassign</button>
+                  <button class="mock-btn mock-btn-outline">See plan</button>
+                </div>
+              </div>
+              <div class="ai-decision" style="border-color:var(--amber)">
+                <div class="ad-title">⬤ Offer for Sr. Backend Engineer expires 5pm.</div>
+                <div class="ad-sub">Candidate has a competing offer. AI recommends a 6% band increase to close today.</div>
+                <div class="ad-btns">
+                  <button class="mock-btn mock-btn-primary">Approve +6%</button>
+                  <button class="mock-btn mock-btn-outline">Review</button>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;padding:6px 0 2px;border-top:1px solid rgba(0,0,0,0.06);margin-top:4px;">
+                <span style="color:var(--green);font-size:10px;">✓</span>
+                <span style="font-size:8px;color:var(--muted);font-weight:600;">AI handled 37 items overnight · See details</span>
+                <span style="font-size:8px;color:var(--muted);margin-left:auto;">▾</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="explain-col">
+        <div class="explain-grid">
+          <div class="explain-box">
+            <div class="box-label">WHAT IT SHOWS</div>
+            <div class="box-body">A summary of <strong>AI's overnight activity</strong> across 6 connected systems. Shows exactly <strong>2 items that need Vikram's decision</strong> today — a pipeline risk and an expiring offer. Everything else (37 items) was handled autonomously.</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">WHY IT'S HERE FIRST</div>
+            <div class="box-body">A leader's first question every morning is: <strong>"What needs me today?"</strong> This section answers that in 10 seconds — with context already included. No hunting through emails, Slack, or dashboards.</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">DECISION ITEMS</div>
+            <div class="box-body">
+              <strong>Item 1 (Red dot · Critical)</strong> — Platform pipeline slipped 8%. AI has already computed the fix: reassign one engineer from Growth. Vikram just needs to approve or see the plan.<br><br>
+              <strong>Item 2 (Amber dot · Urgent)</strong> — Offer expires at 5pm. Competing offer exists. AI recommends +6% band. One tap to approve or review the details.
+            </div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">DESIGN CHOICES</div>
+            <div class="box-body">
+              <strong>Lavender tinted card</strong> signals AI content, not a regular notification.<br><br>
+              <strong>Color-coded dots</strong> (red = critical, amber = time-sensitive) give urgency at a glance without reading.<br><br>
+              <strong>"AI handled 37 overnight"</strong> accordion builds trust — Vikram can verify what AI did before approving the remaining 2.
+            </div>
+          </div>
+          <div class="explain-box full">
+            <div class="box-label">LEADER BENEFIT</div>
+            <div class="box-body">
+              Replaces 20–30 minutes of morning triage. Instead of opening 5 systems, Vikram sees exactly what needs his attention — with the AI's recommended action already surfaced. The accordion gives full auditability if he wants to verify what AI handled independently.
+              <div class="insight-row">
+                <span class="insight-chip" style="background:var(--purple-light);color:var(--purple);">✦ AI-curated</span>
+                <span class="insight-chip" style="background:var(--red-light);color:var(--red);">2 decisions today</span>
+                <span class="insight-chip" style="background:var(--green-light);color:var(--green);">37 auto-handled</span>
+                <span class="insight-chip" style="background:var(--jio-light);color:var(--jio);">Context included</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S2: PERFORMANCE ── -->
+  <div class="section-card" id="s2">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div class="section-meta">
+        <div class="section-tag tag-perf">📊 MONITORING · TEAM DELIVERY</div>
+        <div class="section-title">Performance</div>
+        <div class="section-sub">Mid-page · Monthly snapshot · Ordered by urgency (Off track → At risk → Healthy)</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="mockup-col">
+        <div class="phone-label">MOCKUP PREVIEW</div>
+        <div class="mockup-frame">
+          <div class="mock-section">
+            <div class="mock-label">PERFORMANCE <span style="color:var(--jio);font-size:8px;font-weight:600;">Reports ›</span></div>
+            <div style="margin-bottom:8px;">
+              <div class="mock-sub" style="margin-bottom:2px;">On-time delivery · May</div>
+              <div class="mock-big">86%</div>
+              <div style="font-size:8px;color:var(--green);font-weight:600;">↑ +4 pts</div>
+            </div>
+            <div style="display:flex;gap:4px;margin-bottom:6px;opacity:0.5;justify-content:flex-end;">
+              <div style="width:6px;height:18px;background:var(--jio);border-radius:2px;"></div>
+              <div style="width:6px;height:22px;background:var(--jio);border-radius:2px;"></div>
+              <div style="width:6px;height:20px;background:var(--jio);border-radius:2px;"></div>
+              <div style="width:6px;height:24px;background:var(--jio);border-radius:2px;"></div>
+              <div style="width:6px;height:28px;background:var(--jio);border-radius:2px;"></div>
+              <div style="width:6px;height:32px;background:var(--jio);border-radius:2px;"></div>
+            </div>
+            <div class="mock-metric-row">
+              <div style="display:flex;align-items:center;">
+                <div class="mock-metric-accent" style="background:var(--red);"></div>
+                <span class="mock-metric-label" style="font-weight:700;">Capacity load</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <span class="mock-metric-val">113%</span>
+                <span class="mock-pill pill-red">⬤ Off track</span>
+              </div>
+            </div>
+            <div class="mock-metric-row">
+              <div style="display:flex;align-items:center;">
+                <div class="mock-metric-accent" style="background:transparent;"></div>
+                <span class="mock-metric-label">Escaped defects</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <span class="mock-metric-val">14 this mo</span>
+                <span class="mock-pill pill-amber">⬤ At risk</span>
+              </div>
+            </div>
+            <div class="mock-metric-row">
+              <div style="display:flex;align-items:center;">
+                <div class="mock-metric-accent" style="background:transparent;"></div>
+                <span class="mock-metric-label">Sprint velocity</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <span class="mock-metric-val">92 pts</span>
+                <span class="mock-pill pill-green">⬤ Healthy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="explain-col">
+        <div class="explain-grid">
+          <div class="explain-box">
+            <div class="box-label">WHAT IT SHOWS</div>
+            <div class="box-body"><strong>Hero metric:</strong> On-time delivery at 86% (↑+4pts vs last month), with a 6-bar trend chart.<br><br><strong>3 secondary metrics</strong> ordered by urgency: Capacity load (113% · Off track), Escaped defects (14 · At risk), Sprint velocity (92pts · Healthy).</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">WHY ORDERED THIS WAY</div>
+            <div class="box-body"><strong>Off track always leads.</strong> Capacity at 113% is an action item — it compounds delivery risk if ignored. Healthy metrics fall to the bottom. A 2-second glance tells Vikram whether his team needs intervention today.</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">KEY DESIGN DETAIL</div>
+            <div class="box-body"><strong>Red left accent stripe</strong> on the "Off track" Capacity load row visually separates it from the others — it reads as urgent before the status pill is even read.<br><br><strong>Status pills</strong> (colored dot + label) give semantic meaning beyond just a number.</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">KNOWN IMPROVEMENT (V3)</div>
+            <div class="box-body">The hero "86%" currently has no explicit target. <strong>Adding "of 95% target"</strong> as a sub-label would let Vikram instantly judge whether to act — without needing to ask the team what the benchmark is.</div>
+          </div>
+          <div class="explain-box full">
+            <div class="box-label">LEADER BENEFIT</div>
+            <div class="box-body">One glance surfaces whether the team is delivering, strained, or shipping quality. The "Reports ›" link goes deeper when Vikram needs to present to the board.
+              <div class="insight-row">
+                <span class="insight-chip" style="background:var(--red-light);color:var(--red);">Off track leads</span>
+                <span class="insight-chip" style="background:var(--jio-light);color:var(--jio);">Hero metric + trend</span>
+                <span class="insight-chip" style="background:#F0F2F5;color:var(--muted);">Drill-in via Reports ›</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S3: EXPENSE & BUDGET ── -->
+  <div class="section-card" id="s3">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div class="section-meta">
+        <div class="section-tag tag-budget">💰 BUDGET STEWARDSHIP · REAL-TIME</div>
+        <div class="section-title">Expense &amp; Budget</div>
+        <div class="section-sub">Mid-page · Q2 snapshot · With AI verdict bar above for instant context</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="mockup-col">
+        <div class="phone-label">MOCKUP PREVIEW</div>
+        <div class="mockup-frame">
+          <div class="mock-section">
+            <div class="verdict-bar">4% over pace · Team Travel (+8%) is the main driver. Review breakdown →</div>
+            <div class="mock-label">EXPENSE &amp; BUDGET <span style="color:var(--jio);font-size:8px;font-weight:600;">Breakdown</span></div>
+            <div class="mock-sub" style="margin-bottom:2px;">Q2 spend vs plan</div>
+            <div class="mock-big" style="margin-bottom:2px;">₹86L</div>
+            <div class="mock-sub" style="margin-bottom:6px;">of ₹1.04 Cr</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:79%;background:var(--jio);"></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:7px;color:var(--muted);">Pace 79%</span>
+              <span class="mock-pill pill-amber" style="font-size:7px;">4% over pace</span>
+            </div>
+            <div class="mock-metric-row">
+              <span class="mock-metric-label">Team travel</span>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span class="mock-metric-val">₹35L</span>
+                <span style="font-size:7px;color:var(--red);font-weight:600;">+8% vs plan</span>
+              </div>
+            </div>
+            <div class="mock-metric-row">
+              <span class="mock-metric-label">Contractors</span>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span class="mock-metric-val">₹24L</span>
+                <span style="font-size:7px;color:var(--green);font-weight:600;">Under plan</span>
+              </div>
+            </div>
+            <div class="mock-metric-row">
+              <span class="mock-metric-label">Tooling &amp; SaaS</span>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span class="mock-metric-val">₹17L</span>
+                <span style="font-size:7px;color:var(--muted);font-weight:600;">On plan</span>
+              </div>
+            </div>
+            <div class="mock-metric-row">
+              <span class="mock-metric-label">Training &amp; events</span>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span class="mock-metric-val">₹10L</span>
+                <span style="font-size:7px;color:var(--amber);font-weight:600;">+15% vs plan</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="explain-col">
+        <div class="explain-grid">
+          <div class="explain-box">
+            <div class="box-label">WHAT IT SHOWS</div>
+            <div class="box-body"><strong>AI verdict bar (green):</strong> Plain-language summary — "4% over pace · Team Travel is the main driver."<br><br><strong>Hero:</strong> ₹86L spent of ₹1.04 Cr Q2 plan (Pace 79%, 4% over pace).<br><br><strong>Breakdown:</strong> Team travel, Contractors, Tooling, Training by category with vs-plan labels.</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">WHY THE VERDICT BAR EXISTS</div>
+            <div class="box-body">The raw numbers (₹86L, Pace 79%, 4% over pace) require mental math to interpret. The <strong>green AI verdict bar answers the implicit question</strong>: "Should I be worried?" — with one sentence and a drill-in link.</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">CATEGORY BREAKDOWN</div>
+            <div class="box-body">Each line shows actual spend + whether it's over or under plan:<br><br>
+              <strong>Team Travel ₹35L</strong> → +8% vs plan (problem)<br>
+              <strong>Contractors ₹24L</strong> → Under plan (good)<br>
+              <strong>Tooling ₹17L</strong> → On plan (fine)<br>
+              <strong>Training ₹10L</strong> → +15% vs plan (watch)
+            </div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">LEADER BENEFIT</div>
+            <div class="box-body">Vikram has <strong>budget accountability</strong> without opening a finance report. He can see at 8am whether Q2 is tracking — and which category to address in his weekly team call. "Breakdown ›" goes deeper.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S4: ACTION ITEMS ── -->
+  <div class="section-card" id="s4">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div class="section-meta">
+        <div class="section-tag tag-action">✓ APPROVAL MANAGEMENT · AI-ASSISTED</div>
+        <div class="section-title">Action Items</div>
+        <div class="section-sub">Mid-page · 23 total · AI handles 14 routine · 9 need Vikram's review</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="mockup-col">
+        <div class="phone-label">MOCKUP PREVIEW</div>
+        <div class="mockup-frame">
+          <div class="mock-section">
+            <div class="mock-label">ACTION ITEMS <span style="color:var(--jio);font-size:8px;font-weight:600;">All approvals ›</span></div>
+            <div class="mock-row" style="margin-bottom:8px;">
+              <div class="mock-big">23</div>
+              <div class="mock-sub">waiting on you</div>
+            </div>
+            <div style="display:flex;gap:4px;margin-bottom:8px;">
+              <div class="count-tile">
+                <div class="ct-num" style="color:var(--jio);">12</div>
+                <div class="ct-lbl">Leave</div>
+              </div>
+              <div class="count-tile">
+                <div class="ct-num" style="color:var(--jio);">6</div>
+                <div class="ct-lbl">Travel</div>
+              </div>
+              <div class="count-tile">
+                <div class="ct-num" style="color:var(--jio);">3</div>
+                <div class="ct-lbl">Expense</div>
+              </div>
+              <div class="count-tile">
+                <div class="ct-num" style="color:var(--jio);">2</div>
+                <div class="ct-lbl">Sign-offs</div>
+              </div>
+            </div>
+            <div style="background:var(--purple-light);border-radius:8px;padding:8px;margin-bottom:6px;">
+              <div style="font-size:8px;font-weight:700;color:var(--purple);margin-bottom:2px;">✦ 14 are low-risk and within policy.</div>
+              <div style="font-size:7px;color:var(--muted);">Routine leave &amp; expenses under ₹10,000.</div>
+            </div>
+            <button style="width:100%;background:var(--jio);color:white;border:none;border-radius:10px;padding:8px;font-size:9px;font-weight:700;margin-bottom:4px;">✦ Confirm 14 approvals</button>
+            <div style="text-align:center;font-size:8px;color:var(--jio);font-weight:600;margin-bottom:3px;">Review remaining 9 myself</div>
+            <div style="font-size:7px;color:var(--subtle);text-align:center;line-height:1.4;">A list of all 14 items appears before any approvals are committed.</div>
+          </div>
+        </div>
+      </div>
+      <div class="explain-col">
+        <div class="explain-grid">
+          <div class="explain-box">
+            <div class="box-label">WHAT IT SHOWS</div>
+            <div class="box-body"><strong>23 total approvals</strong> split into 4 categories: Leave (12), Travel (6), Expense (3), Sign-offs (2).<br><br>AI identifies <strong>14 as low-risk and routine</strong> (within policy, under ₹10K). The remaining <strong>9 require Vikram's manual review.</strong></div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">THE AI SUGGESTION BAR</div>
+            <div class="box-body">The purple AI bar explains <em>why</em> 14 items are safe to confirm: "Routine leave &amp; expenses under ₹10,000."<br><br><strong>"Confirm 14 approvals"</strong> button shows the full item list before committing (2-step flow). A safety hint below confirms this.</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">COUNT TILES (4 CATEGORIES)</div>
+            <div class="box-body">
+              <strong>Leave (12)</strong> — Team members requesting time off<br>
+              <strong>Travel (6)</strong> — Business travel authorisation<br>
+              <strong>Expense (3)</strong> — Reimbursement claims over threshold<br>
+              <strong>Sign-offs (2)</strong> — Documents requiring leader signature
+            </div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">TWO PATHS FOR VIKRAM</div>
+            <div class="box-body">
+              <strong>Path 1 — AI-assisted:</strong> Tap "Confirm 14 approvals" → see item list → approve. Saves ~25 minutes.<br><br>
+              <strong>Path 2 — Manual:</strong> Tap "Review remaining 9 myself" → go to full approvals queue → review individually.
+            </div>
+          </div>
+          <div class="explain-box full">
+            <div class="box-label">LEADER BENEFIT</div>
+            <div class="box-body">AI reduces the approval burden by 60% without removing Vikram's control. Routine items are handled intelligently; complex or high-value decisions remain with the leader.
+              <div class="insight-row">
+                <span class="insight-chip" style="background:var(--purple-light);color:var(--purple);">AI-assisted</span>
+                <span class="insight-chip" style="background:var(--red-light);color:var(--red);">23 pending</span>
+                <span class="insight-chip" style="background:var(--green-light);color:var(--green);">14 auto-approvable</span>
+                <span class="insight-chip" style="background:var(--jio-light);color:var(--jio);">9 need Vikram</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S5: TEAM TODAY ── -->
+  <div class="section-card" id="s5">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div class="section-meta">
+        <div class="section-tag tag-team">👥 TEAM AVAILABILITY · REAL-TIME</div>
+        <div class="section-title">Team Today</div>
+        <div class="section-sub">Mid-page · Live headcount snapshot · 4 availability stats</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="mockup-col">
+        <div class="phone-label">MOCKUP PREVIEW</div>
+        <div class="mockup-frame">
+          <div class="mock-section">
+            <div class="mock-label">TEAM TODAY <span style="color:var(--jio);font-size:8px;font-weight:600;">Team ›</span></div>
+            <div class="progress-bar" style="margin-bottom:4px;">
+              <div style="height:100%;width:100%;background:var(--green);border-radius:4px;display:flex;overflow:hidden;">
+                <div style="width:85.6%;background:var(--green);"></div>
+                <div style="width:8.8%;background:var(--amber);"></div>
+                <div style="width:5.6%;background:var(--red);"></div>
+              </div>
+            </div>
+            <div class="mock-stat-row">
+              <div class="mock-stat">
+                <div class="sv" style="color:var(--ink);">250</div>
+                <div class="sl">HEADCOUNT</div>
+              </div>
+              <div class="mock-stat" style="border-left:1px solid var(--border);">
+                <div class="sv" style="color:var(--green);">214</div>
+                <div class="sl">PRESENT</div>
+              </div>
+              <div class="mock-stat" style="border-left:1px solid var(--border);">
+                <div class="sv" style="color:var(--amber);">22</div>
+                <div class="sl">ON LEAVE</div>
+              </div>
+              <div class="mock-stat" style="border-left:1px solid var(--border);">
+                <div class="sv" style="color:var(--red);">14</div>
+                <div class="sl">NOT IN</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="explain-col">
+        <div class="explain-grid">
+          <div class="explain-box">
+            <div class="box-label">WHAT IT SHOWS</div>
+            <div class="box-body">4-stat strip with a segmented progress bar:<br><br>
+              <strong>250 Headcount</strong> — Total team size (the baseline)<br>
+              <strong>214 Present</strong> — Available and at work today (85.6%)<br>
+              <strong>22 On Leave</strong> — Approved absence today<br>
+              <strong>14 Not In</strong> — Unaccounted absence / remote
+            </div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">WHY LEADERS NEED THIS</div>
+            <div class="box-body">Before pushing a deadline, calling an all-hands, or approving a sprint plan — a leader needs to know <strong>who's actually available today.</strong> This answers that instantly without opening an attendance system.</div>
+          </div>
+          <div class="explain-box full">
+            <div class="box-label">DESIGN CHOICE — SEGMENTED BAR</div>
+            <div class="box-body">The coloured progress bar (green → amber → red) gives a visual ratio of Present vs. Leave vs. Not In before the numbers are read. The "Team ›" link drills into a named list of who's where.
+              <div class="insight-row">
+                <span class="insight-chip" style="background:var(--green-light);color:var(--green);">85.6% available</span>
+                <span class="insight-chip" style="background:var(--amber-light);color:var(--amber);">8.8% on leave</span>
+                <span class="insight-chip" style="background:var(--red-light);color:var(--red);">5.6% not in</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S6: RECRUITMENT ── -->
+  <div class="section-card" id="s6">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div class="section-meta">
+        <div class="section-tag tag-recruit">🎯 HIRING PIPELINE · ROLE-LEVEL HEALTH</div>
+        <div class="section-title">Recruitment</div>
+        <div class="section-sub">Mid-page · 3 key roles shown · Health status per role · 1 critical flag</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="mockup-col">
+        <div class="phone-label">MOCKUP PREVIEW</div>
+        <div class="mockup-frame">
+          <div class="mock-section">
+            <div class="mock-label">
+              <span>RECRUITMENT</span>
+              <span style="display:flex;gap:6px;align-items:center;">
+                <span style="font-size:7px;font-weight:700;color:var(--red);">⬤ 1 critical</span>
+                <span style="color:var(--jio);font-size:8px;font-weight:600;">All 8 roles ›</span>
+              </span>
+            </div>
+            <div style="margin-bottom:4px;">
+              <div class="mock-row">
+                <div>
+                  <div class="mock-text">Sr. Backend Engineer</div>
+                  <div class="mock-sub">4 in final round</div>
+                </div>
+                <span class="mock-pill pill-green">⬤ Healthy</span>
+              </div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:6px;margin-bottom:4px;">
+              <div class="mock-row">
+                <div>
+                  <div class="mock-text">EM, Platform</div>
+                  <div class="mock-sub">Stalled 9 days · no movement</div>
+                </div>
+                <span class="mock-pill pill-amber">⬤ At risk</span>
+              </div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:6px;">
+              <div class="mock-row">
+                <div>
+                  <div class="mock-text">Product Designer</div>
+                  <div class="mock-sub">71 days open · 0 in pipeline</div>
+                </div>
+                <span class="mock-pill pill-red">⬤ Off track</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="explain-col">
+        <div class="explain-grid">
+          <div class="explain-box">
+            <div class="box-label">WHAT IT SHOWS</div>
+            <div class="box-body">3 key open roles with a health status pill per role:<br><br>
+              <strong>Sr. Backend Engineer</strong> — 4 in final round → Healthy ✓<br>
+              <strong>EM, Platform</strong> — Stalled 9 days, no movement → At risk ⚠<br>
+              <strong>Product Designer</strong> — 71 days open, 0 in pipeline → Off track ✗
+            </div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">WHY LEADERS NEED THIS</div>
+            <div class="box-body">Critical hires that are slipping show up <strong>before they become delivery blockers.</strong> A Product Designer open for 71 days with 0 candidates affects the Q3 product roadmap — not finding out in a Friday review.</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">THE "1 CRITICAL" FLAG</div>
+            <div class="box-body">The red <strong>"⬤ 1 critical"</strong> label next to the section title tells Vikram — before scrolling into the card — that at least one role needs immediate escalation. He can tap "All 8 roles ›" to see the full pipeline.</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">DESIGN CHOICE — CONTEXT LINES</div>
+            <div class="box-body">Each role shows a context sub-line, not just a status:<br>
+              "4 in final round" = specific signal (close to close)<br>
+              "Stalled 9 days · no movement" = actionable alert<br>
+              "71 days open · 0 in pipeline" = critical → escalate
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S7: UPCOMING ── -->
+  <div class="section-card" id="s7">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div class="section-meta">
+        <div class="section-tag tag-info">📅 SCHEDULE AWARENESS · PREP SIGNAL</div>
+        <div class="section-title">Upcoming Events</div>
+        <div class="section-sub">Near-bottom · Next 2 relevant events with time-to-event and prep status</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="mockup-col">
+        <div class="phone-label">MOCKUP PREVIEW</div>
+        <div class="mockup-frame">
+          <div class="mock-section">
+            <div class="mock-label">UPCOMING</div>
+            <div style="margin-bottom:6px;">
+              <div class="mock-row">
+                <div style="background:var(--jio);border-radius:8px;padding:4px 7px;text-align:center;min-width:44px;">
+                  <div style="font-size:10px;font-weight:800;color:white;">10:00</div>
+                  <div style="font-size:7px;color:rgba(255,255,255,0.7);">Today</div>
+                </div>
+                <div style="flex:1;margin-left:8px;">
+                  <div class="mock-text">Q2 Leadership Review</div>
+                  <div class="mock-sub">You present · 6 attendees</div>
+                </div>
+                <span style="font-size:7px;font-weight:700;background:var(--jio-light);color:var(--jio);border-radius:8px;padding:2px 6px;">in 1h 8m</span>
+              </div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:6px;">
+              <div class="mock-row">
+                <div style="border:1px solid var(--border);border-radius:8px;padding:4px 7px;text-align:center;min-width:44px;">
+                  <div style="font-size:10px;font-weight:800;color:var(--ink);">09:00</div>
+                  <div style="font-size:7px;color:var(--muted);">Mon</div>
+                </div>
+                <div style="flex:1;margin-left:8px;">
+                  <div class="mock-text">Board readout</div>
+                  <div class="mock-sub">Boardroom A · prep deck shared</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="explain-col">
+        <div class="explain-grid">
+          <div class="explain-box">
+            <div class="box-label">WHAT IT SHOWS</div>
+            <div class="box-body">Next 2 leadership-relevant events:<br><br>
+              <strong>Q2 Leadership Review — Today 10:00</strong><br>You present · 6 attendees · "in 1h 8m" countdown badge<br><br>
+              <strong>Board readout — Monday 09:00</strong><br>Boardroom A · prep deck already shared
+            </div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">WHY LEADERS NEED THIS</div>
+            <div class="box-body">Not a full calendar — just the next 2 events that <strong>require the leader's presence or preparation.</strong> The "prep deck shared" note for Monday removes one more morning check — Vikram knows prep is done.</div>
+          </div>
+          <div class="explain-box full">
+            <div class="box-label">KEY DESIGN CHOICES</div>
+            <div class="box-body">
+              <strong>Countdown badge</strong> "in 1h 8m" creates healthy urgency — Vikram can see the Q2 review is imminent without checking a clock.<br><br>
+              <strong>Teal date pill (Today)</strong> vs plain date box (Mon) creates visual hierarchy between imminent and upcoming events.<br><br>
+              <strong>Context sub-lines</strong> ("prep deck shared") reduce cognitive load — one less thing to verify.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S8: WORTH KNOWING ── -->
+  <div class="section-card" id="s8">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <div class="section-meta">
+        <div class="section-tag tag-budget">💡 CONTEXT AWARENESS · SIGNAL TRIAGE</div>
+        <div class="section-title">Worth Knowing</div>
+        <div class="section-sub">Bottom · Policy, wins, people — triaged by action vs. FYI</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="mockup-col">
+        <div class="phone-label">MOCKUP PREVIEW</div>
+        <div class="mockup-frame">
+          <div class="mock-section">
+            <div class="mock-label">WORTH KNOWING</div>
+            <div style="margin-bottom:6px;">
+              <div class="mock-row" style="margin-bottom:2px;">
+                <div style="font-size:7px;font-weight:700;color:var(--subtle);letter-spacing:0.8px;">POLICY</div>
+                <span class="mock-chip-tag mock-chip-action">Action needed</span>
+              </div>
+              <div class="mock-text" style="margin-bottom:2px;">Hybrid work policy goes live Monday</div>
+              <div class="mock-sub">Affects your 3 remote pods — 2 need a desk plan.</div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding:6px 0;">
+              <div class="mock-row" style="margin-bottom:2px;">
+                <div style="font-size:7px;font-weight:700;color:var(--green);letter-spacing:0.8px;">WIN</div>
+                <span class="mock-chip-tag mock-chip-fyi">FYI</span>
+              </div>
+              <div class="mock-text" style="margin-bottom:2px;">Platform cut p95 latency 40%</div>
+              <div class="mock-sub">Worth a shout-out in today's review.</div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:6px;">
+              <div class="mock-row" style="margin-bottom:2px;">
+                <div style="font-size:7px;font-weight:700;color:var(--jio);letter-spacing:0.8px;">PEOPLE</div>
+                <span class="mock-chip-tag mock-chip-fyi">FYI</span>
+              </div>
+              <div class="mock-text" style="margin-bottom:2px;">Aanya returns from leave today</div>
+              <div class="mock-sub">Back on the Design team after 4 months.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="explain-col">
+        <div class="explain-grid">
+          <div class="explain-box">
+            <div class="box-label">WHAT IT SHOWS</div>
+            <div class="box-body">3 items across different signal types:<br><br>
+              <strong>POLICY (Action needed)</strong> — Hybrid work policy goes live Monday. 2 remote pods need a desk plan from Vikram.<br>
+              <strong>WIN (FYI)</strong> — Platform cut p95 latency 40%. Good for today's review shout-out.<br>
+              <strong>PEOPLE (FYI)</strong> — Aanya returns from 4-month leave. Know before the day's standup.
+            </div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">ACTION NEEDED vs. FYI CHIPS</div>
+            <div class="box-body">The <strong>amber "Action needed" chip</strong> flags that the POLICY item requires Vikram to respond before Monday. The <strong>gray "FYI" chip</strong> signals informational items — read them, but no follow-up required.</div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">WHY LEADERS NEED THIS</div>
+            <div class="box-body">
+              <strong>Policy</strong> — A leader who misses a rollout and hasn't planned for remote pods gets caught in a meeting on Monday.<br><br>
+              <strong>Wins</strong> — Recognising a team win in today's review builds morale. The dashboard prompts this.<br><br>
+              <strong>People</strong> — Knowing Aanya is back lets Vikram re-assign work or say hello first thing.
+            </div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">DESIGN CHOICE — SIGNAL TRIAGE</div>
+            <div class="box-body">Before this chip system, all 3 items looked identical — leaders treated them all as informational and missed the policy action. The chips remove that ambiguity at first glance.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── S9: BOTTOM NAV ── -->
+  <div class="section-card" id="s9">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <div class="section-meta">
+        <div class="section-tag tag-nav">🧭 NAVIGATION · DEEP-LINK ACCESS</div>
+        <div class="section-title">Bottom Navigation</div>
+        <div class="section-sub">Persistent across all screens · 5 tabs · Approvals badge shows pending count</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="mockup-col">
+        <div class="phone-label">MOCKUP PREVIEW</div>
+        <div class="mockup-frame">
+          <div style="background:white;border-top:1px solid var(--border);padding:8px 0 4px;">
+            <div style="display:flex;justify-content:space-around;align-items:center;">
+              <div style="text-align:center;flex:1;">
+                <div style="font-size:16px;">🏠</div>
+                <div style="font-size:7px;font-weight:700;color:var(--jio);margin-top:2px;">Home</div>
+                <div style="width:20px;height:2px;background:var(--jio);border-radius:1px;margin:3px auto 0;"></div>
+              </div>
+              <div style="text-align:center;flex:1;">
+                <div style="font-size:16px;">👥</div>
+                <div style="font-size:7px;color:var(--subtle);margin-top:2px;">Team</div>
+              </div>
+              <div style="text-align:center;flex:1;position:relative;">
+                <div style="font-size:16px;">✓</div>
+                <div style="position:absolute;top:0;right:20%;background:var(--red);color:white;font-size:7px;font-weight:700;border-radius:8px;padding:0 4px;min-width:14px;text-align:center;">23</div>
+                <div style="font-size:7px;color:var(--subtle);margin-top:2px;">Approvals</div>
+              </div>
+              <div style="text-align:center;flex:1;">
+                <div style="font-size:16px;">📊</div>
+                <div style="font-size:7px;color:var(--subtle);margin-top:2px;">Reports</div>
+              </div>
+              <div style="text-align:center;flex:1;">
+                <div style="font-size:16px;">⋯</div>
+                <div style="font-size:7px;color:var(--subtle);margin-top:2px;">More</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="explain-col">
+        <div class="explain-grid">
+          <div class="explain-box">
+            <div class="box-label">5 TAB BREAKDOWN</div>
+            <div class="box-body">
+              <strong>Home</strong> — This homepage (active, blue underline indicator)<br>
+              <strong>Team</strong> — Full team directory, org chart, availability<br>
+              <strong>Approvals</strong> — Full approvals queue (badge shows 23 pending)<br>
+              <strong>Reports</strong> — Detailed analytics: performance, expense, headcount<br>
+              <strong>More</strong> — Settings, notifications, preferences
+            </div>
+          </div>
+          <div class="explain-box">
+            <div class="box-label">LEADER-TUNED TABS</div>
+            <div class="box-body">These tabs are <strong>different from the employee nav</strong> (which shows Attendance · Payroll · Learn). Leaders get <strong>Team, Approvals, Reports</strong> — reflecting their actual daily workflows rather than individual employee tasks.</div>
+          </div>
+          <div class="explain-box full">
+            <div class="box-label">THE APPROVALS BADGE</div>
+            <div class="box-body">The <strong>red "23" badge</strong> on the Approvals tab persists across all screens — Vikram always knows how many approvals are waiting even when browsing Reports or Team. The number updates in real-time as he confirms approvals from the homepage.
+              <div class="insight-row">
+                <span class="insight-chip" style="background:var(--jio-light);color:var(--jio);">Role-specific tabs</span>
+                <span class="insight-chip" style="background:var(--red-light);color:var(--red);">Live count badge</span>
+                <span class="insight-chip" style="background:#F0F2F5;color:var(--muted);">Deep-link to queues</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DESIGN JOURNEY ── -->
+  <div class="journey-section" id="journey">
+    <div class="journey-title">Design Journey</div>
+    <div class="journey-sub">From the original screen to the current state — how the score improved</div>
+    <div class="journey-steps">
+      <div class="journey-step">
+        <div class="js-label">ORIGINAL · V2</div>
+        <div class="js-score" style="color:var(--amber);">7.5<span style="font-size:18px;font-weight:400;color:rgba(255,255,255,0.3);"> / 10</span></div>
+        <div class="js-title">Good — but had risks</div>
+        <div class="js-list">
+          ✗ Auto-approve fired with 1 tap, no confirmation<br>
+          ✗ "Review remaining 23" — wrong count<br>
+          ✗ Performance: Off track buried at bottom<br>
+          ✗ No expense verdict — required mental math<br>
+          ✗ Worth Knowing: no action vs. FYI distinction<br>
+          ✗ Accordion ✓ icon signalled "done" not "expand"
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;">
+        <div class="js-arrow">→</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;">6 fixes<br>applied</div>
+        <div style="font-size:11px;color:var(--orange);font-weight:700;text-align:center;">+1.0 point</div>
+      </div>
+      <div class="journey-step" style="border-color:rgba(44,155,82,0.3);">
+        <div class="js-label">CURRENT · V3</div>
+        <div class="js-score" style="color:var(--green);">8.5<span style="font-size:18px;font-weight:400;color:rgba(255,255,255,0.3);"> / 10</span></div>
+        <div class="js-title">Excellent — 6 remaining refinements</div>
+        <div class="js-list">
+          ✓ "Confirm 14 approvals" — 2-step with item list<br>
+          ✓ "Review remaining 9 myself" — correct count<br>
+          ✓ Performance reordered: Off track leads<br>
+          ✓ Green verdict bar anchors expense insight<br>
+          ✓ "Action needed" + "FYI" chips on Worth Knowing<br>
+          ✓ "AI handled 37 items · See details ▾"
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-left">
+      <div class="ft">PeopleFirst UX Audit — Leader Homepage</div>
+      <div class="fs">Vikram's view · June 2026 · Score: 8.5 / 10 EXCELLENT</div>
+    </div>
+    <div class="footer-right">Built with Claude Code · Jio PeopleFirst Design System</div>
+  </div>
+
+</main>
+
+<script>
+  // Highlight active nav item on scroll
+  const sections = document.querySelectorAll('[id^="s"], #journey');
+  const navItems = document.querySelectorAll('.nav-item');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navItems.forEach(n => n.classList.remove('active'));
+        const active = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

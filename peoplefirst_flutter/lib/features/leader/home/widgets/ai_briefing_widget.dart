@@ -15,8 +15,47 @@ class AiBriefingWidget extends ConsumerStatefulWidget {
   ConsumerState<AiBriefingWidget> createState() => _AiBriefingWidgetState();
 }
 
-class _AiBriefingWidgetState extends ConsumerState<AiBriefingWidget> {
+class _AiBriefingWidgetState extends ConsumerState<AiBriefingWidget>
+    with TickerProviderStateMixin {
   bool _autoExpanded = false;
+
+  late final AnimationController _entranceCtrl;
+  late final Animation<double> _entranceFade;
+  late final Animation<double> _entranceScale;
+
+  late final AnimationController _pulseCtrl;
+  late final Animation<double> _pulseAnim;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _entranceCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _entranceFade = CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOut);
+    _entranceScale = Tween<double>(begin: 0.96, end: 1.0).animate(
+      CurvedAnimation(parent: _entranceCtrl, curve: Curves.easeOutCubic),
+    );
+
+    _pulseCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2800),
+    )..repeat(reverse: true);
+    _pulseAnim = CurvedAnimation(parent: _pulseCtrl, curve: Curves.easeInOut);
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) _entranceCtrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _entranceCtrl.dispose();
+    _pulseCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,172 +68,198 @@ class _AiBriefingWidgetState extends ConsumerState<AiBriefingWidget> {
         final unresolved = decisions.where((d) => !d.resolved).toList();
         final allResolved = unresolved.isEmpty;
 
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.surfaceMinimal,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x0A0F172A),
-                blurRadius: 8,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          clipBehavior: Clip.hardEdge,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Sky header band
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF1A5C8A), Color(0xFF2F8FD4)],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
+        return FadeTransition(
+          opacity: _entranceFade,
+          child: ScaleTransition(
+            scale: _entranceScale,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.surfaceMinimal,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x0A0F172A),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
                   ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.auto_awesome,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                    const SizedBox(width: 8),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'PeopleFirst AI',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            'Overnight brief · updated 8:47am',
-                            style: TextStyle(
-                              color: Color(0xCCFFFFFF),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (!allResolved)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          '${unresolved.length} critical',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+                ],
               ),
-
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (allResolved)
-                      _ClearedState()
-                    else ...[
-                      Text(
-                        '${unresolved.length} critical items for today',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.skyInk,
-                        ),
+              clipBehavior: Clip.hardEdge,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Sky header band
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xFF1A5C8A), Color(0xFF2F8FD4)],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
                       ),
-                      const SizedBox(height: 12),
-                      ...unresolved.map((d) => _DecisionCard(
-                            decision: d,
-                            onPrimary: () {
-                              ref
-                                  .read(decisionsProvider.notifier)
-                                  .resolve(d.id);
-                              ref.read(toastProvider.notifier).show(
-                                    '${d.primaryCta} action taken',
-                                  );
-                            },
-                            onSecondary: () {
-                              ref
-                                  .read(decisionsProvider.notifier)
-                                  .resolve(d.id);
-                              ref.read(toastProvider.notifier).show(
-                                    'Opening ${d.secondaryCta}...',
-                                  );
-                            },
-                          )),
-                    ],
-
-                    const SizedBox(height: 12),
-                    const Divider(height: 1),
-                    const SizedBox(height: 8),
-
-                    // Auto-approved section
-                    GestureDetector(
-                      onTap: () {
-                        setState(() => _autoExpanded = !_autoExpanded);
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.check_circle_rounded,
-                            color: AppColors.positive,
-                            size: 16,
+                    ),
+                    child: Row(
+                      children: [
+                        AnimatedBuilder(
+                          animation: _pulseAnim,
+                          builder: (_, child) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.white.withOpacity(
+                                      0.1 + _pulseAnim.value * 0.35,
+                                    ),
+                                    blurRadius: 8 + _pulseAnim.value * 8,
+                                    spreadRadius: _pulseAnim.value * 2,
+                                  ),
+                                ],
+                              ),
+                              child: child,
+                            );
+                          },
+                          child: const Icon(
+                            Icons.auto_awesome,
+                            color: Colors.white,
+                            size: 18,
                           ),
-                          const SizedBox(width: 6),
-                          const Text(
-                            'Auto approved requests · 29',
-                            style: TextStyle(
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'PeopleFirst AI',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                'Overnight brief · updated 8:47am',
+                                style: TextStyle(
+                                  color: Color(0xCCFFFFFF),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (!allResolved)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              '${unresolved.length} critical',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (allResolved)
+                          _ClearedState()
+                        else ...[
+                          Text(
+                            '${unresolved.length} critical items for today',
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.contentModerate,
+                              color: AppColors.skyInk,
                             ),
                           ),
-                          const Spacer(),
-                          Icon(
-                            _autoExpanded
-                                ? Icons.expand_less_rounded
-                                : Icons.expand_more_rounded,
-                            size: 18,
-                            color: AppColors.contentMinimal,
-                          ),
+                          const SizedBox(height: 12),
+                          ...unresolved.map((d) => _DecisionCard(
+                                decision: d,
+                                onPrimary: () {
+                                  ref
+                                      .read(decisionsProvider.notifier)
+                                      .resolve(d.id);
+                                  ref.read(toastProvider.notifier).show(
+                                        '${d.primaryCta} action taken',
+                                      );
+                                },
+                                onSecondary: () {
+                                  ref
+                                      .read(decisionsProvider.notifier)
+                                      .resolve(d.id);
+                                  ref.read(toastProvider.notifier).show(
+                                        'Opening ${d.secondaryCta}...',
+                                      );
+                                },
+                              )),
                         ],
-                      ),
-                    ),
 
-                    if (_autoExpanded) ...[
-                      const SizedBox(height: 10),
-                      _AutoApproveRow(label: 'Approvals', count: 14),
-                      _AutoApproveRow(label: 'Expenses', count: 9),
-                      _AutoApproveRow(label: 'Calendar', count: 6),
-                    ],
-                  ],
-                ),
+                        const SizedBox(height: 12),
+                        const Divider(height: 1),
+                        const SizedBox(height: 8),
+
+                        // Auto-approved section
+                        GestureDetector(
+                          onTap: () {
+                            setState(() => _autoExpanded = !_autoExpanded);
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.check_circle_rounded,
+                                color: AppColors.positive,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 6),
+                              const Text(
+                                'Auto approved requests · 29',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.contentModerate,
+                                ),
+                              ),
+                              const Spacer(),
+                              Icon(
+                                _autoExpanded
+                                    ? Icons.expand_less_rounded
+                                    : Icons.expand_more_rounded,
+                                size: 18,
+                                color: AppColors.contentMinimal,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        if (_autoExpanded) ...[
+                          const SizedBox(height: 10),
+                          _AutoApproveRow(label: 'Approvals', count: 14),
+                          _AutoApproveRow(label: 'Expenses', count: 9),
+                          _AutoApproveRow(label: 'Calendar', count: 6),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },

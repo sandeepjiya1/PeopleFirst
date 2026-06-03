@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../providers/persona_provider.dart';
 import '../../../shared/widgets/app_header.dart';
 import '../../../shared/screens/chat_screen.dart';
+import '../../../shared/widgets/widget_entrance.dart';
 import 'widgets/ai_briefing_widget.dart';
 import 'widgets/performance_widget.dart';
 import 'widgets/expense_budget_widget.dart';
@@ -39,23 +40,26 @@ class LeaderHomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                const AiBriefingWidget(),
+                WidgetEntrance(index: 0, child: const AiBriefingWidget()),
                 const SizedBox(height: 20),
-                const BookingsWidget(),
+                WidgetEntrance(index: 1, child: const BookingsWidget()),
                 const SizedBox(height: 20),
-                const ActionItemsWidget(),
+                WidgetEntrance(index: 2, child: const ActionItemsWidget()),
                 const SizedBox(height: 20),
-                const TeamSnapshotWidget(),
+                WidgetEntrance(index: 3, child: const TeamSnapshotWidget()),
                 const SizedBox(height: 20),
-                PerformanceWidget(
-                  onReports: () => context.go('/leader/reports'),
+                WidgetEntrance(
+                  index: 4,
+                  child: PerformanceWidget(
+                    onReports: () => context.go('/leader/reports'),
+                  ),
                 ),
                 const SizedBox(height: 20),
-                const ExpenseBudgetWidget(),
+                WidgetEntrance(index: 5, child: const ExpenseBudgetWidget()),
                 const SizedBox(height: 20),
-                const RecruitmentWidget(),
+                WidgetEntrance(index: 6, child: const RecruitmentWidget()),
                 const SizedBox(height: 20),
-                const NewsWidget(),
+                WidgetEntrance(index: 7, child: const NewsWidget()),
                 const SizedBox(height: 100),
               ]),
             ),
