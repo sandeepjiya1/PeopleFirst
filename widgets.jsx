@@ -109,7 +109,7 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 14, fontWeight: 800, color: "var(--sky-ink)", letterSpacing: "-.01em" }}>PeopleFirst AI</div>
-            <div style={{ fontSize: 11.5, color: "var(--sky-ink)", opacity: .7, fontWeight: 500, marginTop: -1 }}>Overnight brief · updated 8:47am</div>
+            <div style={{ fontSize: 11.5, color: "var(--sky-ink)", opacity: .7, fontWeight: 500, marginTop: -1 }}>Morning summary · updated 8:47am</div>
           </div>
         </div>
         <p style={{ margin: "13px 2px 2px", fontSize: 17, fontWeight: 700, lineHeight: 1.32, color: "var(--content-heavy)", letterSpacing: "-.01em", textWrap: "pretty" }}>
@@ -191,68 +191,151 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 2 · PERFORMANCE — honest read of the month
+// 2 · CRITICAL PROJECTS — horizontal scroll cards with sparkline + AI read
 // ═══════════════════════════════════════════════════════════════
 function Performance({ onOpen }) {
-  const cuPerf = useCountUp(86, { suffix: '%', duration: 1200, delay: 200 });
-  const bars = [62, 70, 66, 74, 80, 86]; // last 6 weeks
-  // Priority first: off-track and at-risk lead; healthy drops to the bottom.
-  const subs = [
-  { label: "Team workload", value: "113%", tone: "off" },
-  { label: "Bugs found late", value: "14 this month", tone: "risk" },
-  { label: "Delivery speed", value: "92 pts", tone: "healthy" }];
+  const PROJECTS = [
+    {
+      name: "MyJio 3.1 revamp", status: "on_track", statusLabel: "On track",
+      metric: "On-time delivery", period: "last 6 months",
+      pct: 86, trend: +4, target: 90,
+      bars: [62, 70, 66, 74, 80, 86],
+      months: ["Dec", "Jan", "Feb", "Mar", "Apr", "May"],
+      ai: ["Delivery speed up 8% this quarter.", "Team workload running high at 113%."]
+    },
+    {
+      name: "MyJio App", status: "delayed", statusLabel: "Delayed",
+      metric: "Sprint velocity", period: "last quarter",
+      pct: 86, trend: -12, target: 95,
+      bars: [95, 90, 88, 84, 80, 86],
+      months: ["Dec", "Jan", "Feb", "Mar", "Apr", "May"],
+      ai: ["3 sprints behind on payments rewrite.", "Moving engineer from Growth recovers date."]
+    },
+    {
+      name: "Jio Translate", status: "on_track", statusLabel: "On track",
+      metric: "Feature completion", period: "Q2 2026",
+      pct: 72, trend: 0, target: 85,
+      bars: [60, 65, 68, 70, 71, 72],
+      months: ["Dec", "Jan", "Feb", "Mar", "Apr", "May"],
+      ai: ["On track for Q2 delivery.", "2 features ahead of schedule."]
+    }
+  ];
 
-  const stripe = { off: "var(--negative)", risk: "var(--warning)", healthy: "transparent" };
+  const summary = { total: 74, onTime: 47, delayed: 19, onHold: 8 };
+  const statusColor = (s) => s === "on_track" ? "var(--positive)" : s === "delayed" ? "var(--negative)" : "var(--warning)";
+  const statusBg   = (s) => s === "on_track" ? "var(--positive-light)" : s === "delayed" ? "var(--negative-light)" : "var(--warning-light)";
+  const [active, setActive] = React.useState(0); // dot indicator
+
+  const Sparkline = ({ bars, target, months }) => {
+    const w = 260, h = 80, padX = 4, padY = 10;
+    const lo = Math.min(...bars, target - 2), hi = Math.max(...bars, target + 2), span = hi - lo || 1;
+    const x = (i) => padX + i * ((w - padX * 2) / (bars.length - 1));
+    const y = (v) => h - padY - (v - lo) / span * (h - padY * 2);
+    const pts = bars.map((v, i) => [x(i), y(v)]);
+    const line = "M" + pts.map(p => p.join(",")).join(" L ");
+    const area = line + ` L ${x(bars.length-1)},${h} L ${x(0)},${h} Z`;
+    const targetY = y(target);
+    const last = pts[pts.length - 1];
+    return (
+      <div style={{ marginTop: 10 }}>
+        <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow: "visible", display: "block" }}>
+          <defs>
+            <linearGradient id="projFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--reliance-base)" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="var(--reliance-base)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          {/* Target dashed line */}
+          <line x1={padX} y1={targetY} x2={w - padX} y2={targetY} stroke="var(--content-minimal)" strokeWidth="1.2" strokeDasharray="4,3" />
+          {/* Area fill */}
+          <path d={area} fill="url(#projFill)" />
+          {/* Line */}
+          <path d={line} fill="none" stroke="var(--reliance-base)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="sparkline-line" />
+          {/* End dot */}
+          <circle cx={last[0]} cy={last[1]} r="4" fill="var(--reliance-base)" stroke="white" strokeWidth="2" className="sparkline-dot" />
+        </svg>
+        {/* Month labels */}
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, padding: `0 ${padX}px` }}>
+          {months.map(m => <span key={m} style={{ fontSize: 10.5, color: "var(--content-minimal)", fontWeight: 500 }}>{m}</span>)}
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <Widget icon="analytics" title="Performance" action="Reports" onAction={onOpen} accent="var(--content-minimal)">
-      <Card surface="elev" pad={16}>
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-          <div>
-            <div style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Work finished on time · May</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 9, marginTop: 6 }}>
-              <span ref={cuPerf.ref} style={{ fontSize: 38, fontWeight: 900, lineHeight: .9, letterSpacing: "-.03em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>{cuPerf.display}</span>
-              <Trend dir="up">+4 pts</Trend>
+    <Widget icon="analytics" title="Critical projects" action="See all" onAction={onOpen}>
+
+      {/* Summary tile + project cards horizontal scroll */}
+      <div style={{ display: "flex", gap: 10, overflowX: "auto", padding: "2px 0 6px", scrollSnapType: "x mandatory" }}
+           onScroll={(e) => {
+             const i = Math.round(e.target.scrollLeft / (e.target.children[0]?.offsetWidth + 10));
+             setActive(i);
+           }}>
+
+        {/* Summary card */}
+        <div style={{ flex: "0 0 160px", scrollSnapAlign: "start", background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 8px rgba(15,23,42,.07)", padding: "16px 14px" }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-moderate)", textTransform: "uppercase", letterSpacing: ".03em" }}>Total projects</div>
+          <div style={{ fontSize: 40, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.03em", lineHeight: 1, marginTop: 6, fontVariantNumeric: "tabular-nums" }}>{summary.total}</div>
+          <div style={{ height: 1, background: "var(--stroke-minimal)", margin: "14px 0 12px" }} />
+          {[
+            { label: "On time", val: summary.onTime, color: "var(--positive)" },
+            { label: "Delayed", val: summary.delayed, color: "var(--negative)" },
+            { label: "On hold", val: summary.onHold, color: "var(--content-minimal)" }
+          ].map(s => (
+            <div key={s.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 9 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ width: 7, height: 7, borderRadius: 999, background: s.color, flexShrink: 0 }} />
+                <span style={{ fontSize: 12.5, fontWeight: 600, color: "var(--content-moderate)" }}>{s.label}</span>
+              </div>
+              <span style={{ fontSize: 15, fontWeight: 800, color: s.color, fontVariantNumeric: "tabular-nums" }}>{s.val}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Project detail cards */}
+        {PROJECTS.map((p, idx) => (
+          <div key={p.name} style={{ flex: "0 0 260px", scrollSnapAlign: "start", background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 8px rgba(15,23,42,.07)", padding: "16px 14px 14px" }}>
+            {/* Header */}
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.2, flex: 1 }}>{p.name}</div>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: statusColor(p.status), background: statusBg(p.status), borderRadius: 999, padding: "3px 10px", whiteSpace: "nowrap", flexShrink: 0 }}>{p.statusLabel}</span>
+            </div>
+            <div style={{ fontSize: 12, color: "var(--content-minimal)", fontWeight: 500, marginTop: 4 }}>{p.metric} · {p.period}</div>
+
+            {/* Metric */}
+            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 10 }}>
+              <span style={{ fontSize: 34, fontWeight: 900, letterSpacing: "-.03em", color: "var(--content-heavy)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{p.pct}%</span>
+              <Trend dir={p.trend >= 0 ? "up" : "down"} good={p.trend >= 0}>{p.trend >= 0 ? "+" : ""}{p.trend} pts</Trend>
+              <span style={{ fontSize: 12, color: "var(--content-minimal)", fontWeight: 500 }}>vs {p.target}% target</span>
+            </div>
+
+            {/* Sparkline with months + target */}
+            <Sparkline bars={p.bars} target={p.target} months={p.months} />
+
+            {/* AI READ */}
+            <div style={{ marginTop: 12, padding: "10px 12px", borderRadius: 12, background: "var(--sky-light)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 7 }}>
+                <Icon name="ai_sparkle" size={14} color="var(--sky)" />
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: "var(--sky-ink)", letterSpacing: ".03em", textTransform: "uppercase" }}>AI Read</span>
+              </div>
+              {p.ai.map((a, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 7, marginTop: i ? 5 : 0 }}>
+                  <span style={{ width: 7, height: 7, borderRadius: 999, background: i === 0 ? "var(--positive)" : "var(--reliance-base)", marginTop: 4, flexShrink: 0 }} />
+                  <span style={{ fontSize: 12.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.35 }}>{a}</span>
+                </div>
+              ))}
             </div>
           </div>
-          {/* trend chart — last 6 weeks */}
-          {(() => {
-            const w = 104, h = 46, pad = 5;
-            const lo = Math.min(...bars), hi = Math.max(...bars), span = hi - lo || 1;
-            const pts = bars.map((v, i) => [Math.round(i * (w / (bars.length - 1)) * 10) / 10, Math.round((h - pad - (v - lo) / span * (h - pad * 2)) * 10) / 10]);
-            const line = "M" + pts.map((p) => p.join(",")).join(" L ");
-            const area = line + ` L ${w},${h} L 0,${h} Z`;
-            const last = pts[pts.length - 1];
-            return (
-              <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ overflow: "visible" }}>
-                <defs>
-                  <linearGradient id="perfFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--reliance-base)" stopOpacity="0.18" />
-                    <stop offset="100%" stopColor="var(--reliance-base)" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <path className="sparkline-area" d={area} fill="url(#perfFill)" />
-                <path className="sparkline-line" d={line} fill="none" stroke="var(--reliance-base)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <circle className="sparkline-dot" cx={last[0]} cy={last[1]} r="3.5" fill="var(--reliance-base)" stroke="var(--surface-minimal)" strokeWidth="2" />
-              </svg>);
+        ))}
+      </div>
 
-          })()}
-        </div>
-        <div style={{ marginTop: 14, borderTop: "1px solid var(--stroke-minimal)", paddingTop: 6 }}>
-          {subs.map((s) => {
-            const isHealthy = s.tone === "healthy";
-            return (
-              <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0 9px 12px", position: "relative" }}>
-                <span style={{ position: "absolute", left: 0, top: 8, bottom: 8, width: 4, borderRadius: 999, background: stripe[s.tone] }} />
-                <span style={{ fontSize: 14, fontWeight: isHealthy ? 600 : 800, color: isHealthy ? "var(--content-moderate)" : "var(--content-heavy)", flex: 1 }}>{s.label}</span>
-                <span style={{ fontSize: 13.5, fontWeight: isHealthy ? 600 : 800, color: isHealthy ? "var(--content-minimal)" : "var(--content-heavy)", fontVariantNumeric: "tabular-nums" }}>{s.value}</span>
-                <Signal tone={s.tone} />
-              </div>);
-
-          })}
-        </div>
-      </Card>
+      {/* Pagination dots */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 10 }}>
+        {[0, 1, 2, 3].map(i => (
+          <span key={i} style={{ width: i === active ? 20 : 7, height: 7, borderRadius: 999, background: i === active ? "var(--reliance-base)" : "var(--stroke-heavy)", transition: "width .3s ease, background .3s ease" }} />
+        ))}
+      </div>
     </Widget>);
-
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -261,26 +344,33 @@ function Performance({ onOpen }) {
 function ActionItems({ state, onBulkApprove, onOpen }) {
   // state: { total, lowRisk, approved }
   const types = [
-  { label: "Leave", n: 12, icon: "calendar", filter: "Leave", tint: "var(--sky)", tintBg: "var(--sky-light)" },
-  { label: "Travel", n: 6, icon: "location", crit: 1, filter: "Travel", tint: "var(--warning)", tintBg: "var(--warning-light)" },
-  { label: "Expense", n: 3, icon: "card", filter: "Expense", tint: "var(--reliance-base)", tintBg: "var(--reliance-50)" },
-  { label: "Sign-offs", n: 2, icon: "document", filter: "Sign-off", tint: "var(--positive)", tintBg: "var(--positive-light)" }];
+  { label: "Leave", n: 12, icon: "calendar", filter: "Leave" },
+  { label: "Travel", n: 6, icon: "location", crit: true, filter: "Travel" },
+  { label: "Expense", n: 3, icon: "card", filter: "Expense" },
+  { label: "Sign-offs", n: 2, icon: "document", filter: "Sign-off" }];
 
   const remaining = state.total - state.approved;
   const cuRemaining = useCountUp(remaining, { duration: 700 });
   return (
     <Widget icon="confirm" title="Approvals" action="See all" onAction={() => onOpen()}>
       <Card surface="elev" pad={16}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span ref={cuRemaining.ref} style={{ fontSize: 30, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{cuRemaining.display}</span>
           <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-moderate)" }}>waiting for you</span>
+          <div style={{ flex: 1 }} />
+          {/* 2 Critical badge */}
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, fontWeight: 700, color: "var(--negative)", background: "var(--negative-light)", borderRadius: 999, padding: "4px 10px", border: "1px solid rgba(220,38,38,.15)" }}>
+            <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--negative)", flexShrink: 0 }} />
+            2 Critical
+          </span>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginTop: 14 }}>
           {types.map((t) =>
           <button key={t.label} onClick={() => onOpen(t.filter)} style={{ position: "relative", background: "var(--surface-subtle)", borderRadius: 12, border: "none", padding: "12px 4px", cursor: "pointer", fontFamily: "inherit", display: "flex", flexDirection: "column", alignItems: "center", gap: 7 }}>
+              {/* Red dot indicator — no number */}
               {t.crit &&
-            <span style={{ position: "absolute", top: -4, right: 14, minWidth: 16, height: 16, padding: "0 4px", borderRadius: 999, background: "var(--negative)", color: "#fff", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", border: "2px solid var(--surface-minimal)", fontVariantNumeric: "tabular-nums" }}>{t.crit}</span>
+            <span style={{ position: "absolute", top: -4, right: -4, width: 10, height: 10, borderRadius: 999, background: "var(--negative)", border: "2px solid var(--surface-minimal)" }} />
             }
               <Icon name={t.icon} size={22} color="var(--sky)" />
               <div style={{ fontSize: 19, fontWeight: 900, color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{t.n}</div>
@@ -717,14 +807,13 @@ Object.assign(window, {
 function ExpenseBudgetBars({ onOpen }) {
   const cuSpent = useCountUp(86, { prefix: '₹', suffix: 'L', duration: 1000 });
   const pct = 83, pace = 79, spent = 86, plan = 104;
+  // Ordered: most critical first (Travel red, Training orange, then healthy)
   const cats = [
-  { label: "Travel", value: 35, display: "₹35L", tone: "risk", note: "+8%" },
+  { label: "Travel", value: 35, display: "₹35L", tone: "off", note: "+11% over" },
+  { label: "Training", value: 10, display: "₹10L", tone: "risk", note: "+8% over" },
   { label: "Contractors", value: 24, display: "₹24L", tone: "healthy", note: "On track" },
-  { label: "Tooling", value: 17, display: "₹17L", tone: "healthy", note: "On track" },
-  { label: "Training", value: 10, display: "₹10L", tone: "off", note: "+15%" }];
+  { label: "Tooling", value: 17, display: "₹17L", tone: "healthy", note: "On track" }];
 
-  const toneRank = { off: 0, risk: 1, healthy: 2 };
-  cats.sort((a, b) => toneRank[a.tone] - toneRank[b.tone]);
   const barColor = (t) => t === "healthy" ? "var(--positive)" : t === "risk" ? "var(--warning)" : "var(--negative)";
   const noteColor = (t) => t === "healthy" ? "var(--content-minimal)" : t === "risk" ? "var(--warning)" : "var(--negative)";
   const max = Math.max(...cats.map((c) => c.value));
@@ -765,11 +854,11 @@ function ExpenseBudgetBars({ onOpen }) {
           })()}
         </div>
 
-        {/* AI recommendation — light sky */}
-        <div style={{ display: "flex", alignItems: "center", gap: 9, marginTop: 14, padding: "10px 12px", borderRadius: 12, background: "var(--sky-light)" }}>
-          <Icon name="ai_sparkle" size={16} color="var(--sky)" style={{ flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.35 }}>
-            {pct - pace}% over plan · <span style={{ color: "var(--sky-ink)" }}>team travel is the main driver</span>
+        {/* AI recommendation — specific to most critical (Travel) */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 9, marginTop: 14, padding: "10px 12px", borderRadius: 12, background: "var(--sky-light)" }}>
+          <Icon name="ai_sparkle" size={16} color="var(--sky)" style={{ flexShrink: 0, marginTop: 1 }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--content-heavy)", lineHeight: 1.45 }}>
+            <span style={{ color: "var(--negative)" }}>Travel ₹35L is 11% over budget</span> — largest overspend this quarter. Consider capping domestic travel approvals until Q3.
           </span>
         </div>
 
