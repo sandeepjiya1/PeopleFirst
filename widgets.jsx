@@ -337,51 +337,94 @@ function Recruitment({ onOpen }) {
   { title: "Engineering Manager, Platform", open: 1, apps: 18, tone: "risk" },
   { title: "Sr. Backend Engineer", open: 3, apps: 142, tone: "healthy" }];
 
-  const cvs = 379,target = 400;
-  const cvPct = Math.round(cvs / target * 1000) / 10; // 94.8
+  const cvs = 379, target = 400;
+  const cvPct = Math.round(cvs / target * 1000) / 10;
   const cuCvs = useCountUp(379, { duration: 1000 });
+
+  // ── Bidirectional scroll animation ──
+  const [expanded, setExpanded] = React.useState(false);
+  const sectionRef = React.useRef(null);
+  const expandTimer = React.useRef(null);
+
+  React.useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      clearTimeout(expandTimer.current);
+      if (e.isIntersecting) {
+        expandTimer.current = setTimeout(() => setExpanded(true), 220);
+      } else {
+        setExpanded(false);
+      }
+    }, { threshold: [0.15, 0.4], rootMargin: "0px 0px -60px 0px" });
+    obs.observe(el);
+    return () => { obs.disconnect(); clearTimeout(expandTimer.current); };
+  }, []);
+
+  const RoleRow = ({ r, divider }) => (
+    <div style={{ padding: "12px 0", borderTop: divider ? "1px solid var(--stroke-minimal)" : "none" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.title}</div>
+          <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, fontVariantNumeric: "tabular-nums" }}>{r.open} open · {r.apps} {r.apps === 1 ? "application" : "applications"}</div>
+        </div>
+        <Signal tone={r.tone} />
+      </div>
+      {r.ai &&
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 7, marginTop: 9, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)" }}>
+          <Icon name="ai_sparkle" size={14} color="var(--sky)" style={{ marginTop: 1 }} />
+          <span style={{ fontSize: 12, color: "var(--sky-ink)", fontWeight: 600, lineHeight: 1.35 }}>{r.ai}</span>
+        </div>
+      }
+    </div>
+  );
+
   return (
     <Widget
       icon="id" title="Recruitment" action="All 8 roles" onAction={onOpen}
       right={<span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--negative)", display: "inline-flex", alignItems: "center", gap: 5, marginRight: 10 }}><Dot tone="off" size={7} />1 urgent</span>}>
 
-      <Card surface="elev" pad={16}>
-        {/* CVs received vs target */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Applications received</span>
-          <Trend dir="up">12%</Trend>
-        </div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 5 }}>
-          <span ref={cuCvs.ref} style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{cuCvs.display}</span>
-          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-minimal)" }}>of {target}</span>
-        </div>
-        <div style={{ height: 6, borderRadius: 999, background: "var(--surface-subtle)", marginTop: 11, overflow: "hidden" }}>
-          <div className="anim-bar" style={{ height: "100%", width: `${cvPct}%`, borderRadius: 999, background: "var(--positive)" }} />
-        </div>
+      <div ref={sectionRef} style={{ position: "relative", paddingBottom: expanded ? 0 : 18, transition: "padding-bottom .5s cubic-bezier(.4,0,.2,1)" }}>
 
-        {/* roles */}
-        <div style={{ marginTop: 14, borderTop: "1px solid var(--stroke-minimal)" }}>
-          {roles.map((r, i) =>
-          <div key={r.title} style={{ padding: "12px 0", borderTop: i ? "1px solid var(--stroke-minimal)" : "none" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.title}</div>
-                  <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2, fontVariantNumeric: "tabular-nums" }}>{r.open} open · {r.apps} {r.apps === 1 ? "application" : "applications"}</div>
+        {/* Peek — back */}
+        <div style={{ position: "absolute", bottom: 0, left: 12, right: 12, height: 22, background: "var(--surface-subtle)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.9 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 280ms, transform .4s ease 280ms", pointerEvents: "none", zIndex: 1 }} />
+        {/* Peek — middle */}
+        <div style={{ position: "absolute", bottom: 9, left: 6, right: 6, height: 22, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 1px 4px rgba(15,23,42,.06)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.95 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 200ms, transform .4s ease 200ms", pointerEvents: "none", zIndex: 2 }} />
+
+        {/* Foreground card */}
+        <div style={{ position: "relative", zIndex: 3, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)", overflow: "hidden", padding: 16 }}>
+
+          {/* CVs header — always visible */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontSize: 12.5, color: "var(--content-moderate)", fontWeight: 600 }}>Applications received</span>
+            <Trend dir="up">12%</Trend>
+          </div>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 7, marginTop: 5 }}>
+            <span ref={cuCvs.ref} style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-.02em", color: "var(--content-heavy)", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>{cuCvs.display}</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--content-minimal)" }}>of {target}</span>
+          </div>
+          <div style={{ height: 6, borderRadius: 999, background: "var(--surface-subtle)", marginTop: 11, overflow: "hidden" }}>
+            <div className="anim-bar" style={{ height: "100%", width: `${cvPct}%`, borderRadius: 999, background: "var(--positive)" }} />
+          </div>
+
+          {/* Role 1 — always visible */}
+          <div style={{ marginTop: 14, borderTop: "1px solid var(--stroke-minimal)" }}>
+            <RoleRow r={roles[0]} divider={false} />
+          </div>
+
+          {/* Roles 2+3 — expand on scroll */}
+          {roles.slice(1).map((r, i) => (
+            <div key={r.title} style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", transition: expanded ? `grid-template-rows .48s cubic-bezier(.4,0,.2,1) ${i * 70}ms` : `grid-template-rows .38s cubic-bezier(.4,0,1,1) ${(1 - i) * 50}ms` }}>
+              <div style={{ minHeight: 0 }}>
+                <div style={{ opacity: expanded ? 1 : 0, transform: expanded ? "translateY(0)" : "translateY(-8px)", transition: expanded ? `opacity .38s ease ${i * 70 + 160}ms, transform .42s cubic-bezier(.4,0,.2,1) ${i * 70 + 110}ms` : "opacity .22s ease 0ms, transform .28s ease 0ms" }}>
+                  <RoleRow r={r} divider={true} />
                 </div>
-                <Signal tone={r.tone} />
               </div>
-              {r.ai &&
-            <div style={{ display: "flex", alignItems: "flex-start", gap: 7, marginTop: 9, padding: "8px 10px", borderRadius: 10, background: "var(--sky-light)" }}>
-                  <Icon name="ai_sparkle" size={14} color="var(--sky)" style={{ marginTop: 1 }} />
-                  <span style={{ fontSize: 12, color: "var(--sky-ink)", fontWeight: 600, lineHeight: 1.35 }}>{r.ai}</span>
-                </div>
-            }
             </div>
-          )}
+          ))}
         </div>
-      </Card>
+      </div>
     </Widget>);
-
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -393,35 +436,72 @@ function Bookings({ onOpen }) {
   { time: "14:30", day: "Today", type: "Meeting", icon: "group", tone: "var(--content-moderate)", title: "1:1 with Karan Mehta", sub: "Platform team · 30 min", soon: null },
   { time: "18:30", day: "Today", type: "Gym", icon: "time", tone: "var(--positive)", title: "Gym slot booked", sub: "Level 2 · 45 min", soon: null }];
 
+  // ── Bidirectional scroll animation ──
+  const [expanded, setExpanded] = React.useState(false);
+  const sectionRef = React.useRef(null);
+  const expandTimer = React.useRef(null);
+
+  React.useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      clearTimeout(expandTimer.current);
+      if (e.isIntersecting) {
+        expandTimer.current = setTimeout(() => setExpanded(true), 220);
+      } else {
+        setExpanded(false);
+      }
+    }, { threshold: [0.15, 0.4], rootMargin: "0px 0px -60px 0px" });
+    obs.observe(el);
+    return () => { obs.disconnect(); clearTimeout(expandTimer.current); };
+  }, []);
+
+  const EventRow = ({ e, i }) => (
+    <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 13px", borderTop: i ? "1px solid var(--stroke-minimal)" : "none", background: "var(--surface-minimal)" }}>
+      <div style={{ width: 54, flexShrink: 0, textAlign: "center", padding: "8px 0", borderRadius: 11, background: i === 0 ? "var(--reliance-base)" : "var(--surface-subtle)", color: i === 0 ? "#fff" : "var(--content-heavy)" }}>
+        <div style={{ fontSize: 16, fontWeight: 900, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{e.time}</div>
+        <div style={{ fontSize: 10.5, fontWeight: 700, opacity: i === 0 ? .85 : .6, marginTop: 1 }}>{e.day}</div>
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: e.tone, textTransform: "uppercase", letterSpacing: ".03em" }}>
+          <Icon name={e.icon} size={13} color={e.tone} />{e.type}
+        </span>
+        <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", marginTop: 3 }}>{e.title}</div>
+        <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{e.sub}</div>
+      </div>
+      {e.soon && <Signal tone="info" dot={false}>{e.soon}</Signal>}
+    </div>
+  );
+
   return (
     <Widget icon="calendar" title="Upcoming" action="Calendar" onAction={onOpen}>
-      <Card surface="elev" pad={4}>
-        {events.map((e, i) =>
-        <div key={e.title} style={{
-          display: "flex", alignItems: "center", gap: 13, padding: "13px 13px",
-          borderTop: i ? "1px solid var(--stroke-minimal)" : "none"
-        }}>
-            <div style={{
-            width: 54, flexShrink: 0, textAlign: "center", padding: "8px 0", borderRadius: 11,
-            background: i === 0 ? "var(--reliance-base)" : "var(--surface-subtle)",
-            color: i === 0 ? "#fff" : "var(--content-heavy)"
-          }}>
-              <div style={{ fontSize: 16, fontWeight: 900, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em" }}>{e.time}</div>
-              <div style={{ fontSize: 10.5, fontWeight: 700, opacity: i === 0 ? .85 : .6, marginTop: 1 }}>{e.day}</div>
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 700, color: e.tone, textTransform: "uppercase", letterSpacing: ".03em" }}>
-                <Icon name={e.icon} size={13} color={e.tone} />{e.type}
-              </span>
-              <div style={{ fontSize: 14.5, fontWeight: 700, color: "var(--content-heavy)", letterSpacing: "-.01em", marginTop: 3 }}>{e.title}</div>
-              <div style={{ fontSize: 12.5, color: "var(--content-moderate)", marginTop: 2 }}>{e.sub}</div>
-            </div>
-            {e.soon && <Signal tone="info" dot={false}>{e.soon}</Signal>}
-          </div>
-        )}
-      </Card>
-    </Widget>);
 
+      <div ref={sectionRef} style={{ position: "relative", paddingBottom: expanded ? 0 : 18, transition: "padding-bottom .5s cubic-bezier(.4,0,.2,1)" }}>
+
+        {/* Peek — back */}
+        <div style={{ position: "absolute", bottom: 0, left: 12, right: 12, height: 22, background: "var(--surface-subtle)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.9 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 280ms, transform .4s ease 280ms", pointerEvents: "none", zIndex: 1 }} />
+        {/* Peek — middle */}
+        <div style={{ position: "absolute", bottom: 9, left: 6, right: 6, height: 22, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 1px 4px rgba(15,23,42,.06)", opacity: expanded ? 0 : 1, transform: `scaleX(${expanded ? 0.95 : 1})`, transition: expanded ? "opacity .25s ease, transform .35s ease" : "opacity .35s ease 200ms, transform .4s ease 200ms", pointerEvents: "none", zIndex: 2 }} />
+
+        {/* Foreground card */}
+        <div style={{ position: "relative", zIndex: 3, background: "var(--surface-minimal)", borderRadius: 16, border: "1px solid var(--stroke-minimal)", boxShadow: "0 2px 10px rgba(15,23,42,.08)", overflow: "hidden" }}>
+
+          {/* Event 1 — always visible */}
+          <EventRow e={events[0]} i={0} />
+
+          {/* Events 2+3 — expand on scroll */}
+          {events.slice(1).map((e, i) => (
+            <div key={e.title} style={{ display: "grid", gridTemplateRows: expanded ? "1fr" : "0fr", transition: expanded ? `grid-template-rows .48s cubic-bezier(.4,0,.2,1) ${i * 70}ms` : `grid-template-rows .38s cubic-bezier(.4,0,1,1) ${(1 - i) * 50}ms` }}>
+              <div style={{ minHeight: 0 }}>
+                <div style={{ opacity: expanded ? 1 : 0, transform: expanded ? "translateY(0)" : "translateY(-8px)", transition: expanded ? `opacity .38s ease ${i * 70 + 160}ms, transform .42s cubic-bezier(.4,0,.2,1) ${i * 70 + 110}ms` : "opacity .22s ease 0ms, transform .28s ease 0ms" }}>
+                  <EventRow e={e} i={i + 1} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Widget>);
 }
 
 // ═══════════════════════════════════════════════════════════════
