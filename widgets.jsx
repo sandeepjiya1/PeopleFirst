@@ -65,24 +65,23 @@ function AIBriefing({ expanded, onToggle, decisions, onResolve, onOpenAssistant 
 
       {/* ── Sky header band — always visible ── */}
       <div style={{
-        background: "linear-gradient(135deg, var(--sky) 0%, color-mix(in oklch, var(--sky) 70%, #5bc8f5) 100%)",
+        background: "linear-gradient(180deg, var(--sky-light) 0%, color-mix(in oklch, var(--sky-light) 55%, white) 100%)",
         padding: "15px 16px 14px"
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
           <span className="ai-sparkle" style={{
-            width: 30, height: 30, borderRadius: 9, background: "rgba(255,255,255,.22)", display: "flex",
-            alignItems: "center", justifyContent: "center",
-            boxShadow: "0 2px 8px -1px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.35)"
+            width: 30, height: 30, borderRadius: 9, background: "var(--sky)", display: "flex",
+            alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px -1px var(--sky-shadow)"
           }}>
             <Icon name="ai_sparkle" size={19} color="#fff" />
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 800, color: "#fff", letterSpacing: "-.01em" }}>PeopleFirst AI</div>
-            <div style={{ fontSize: 11.5, color: "rgba(255,255,255,.75)", fontWeight: 500, marginTop: -1 }}>Overnight brief · updated 8:47am</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: "var(--sky-ink)", letterSpacing: "-.01em" }}>PeopleFirst AI</div>
+            <div style={{ fontSize: 11.5, color: "var(--sky-ink)", opacity: .7, fontWeight: 500, marginTop: -1 }}>Overnight brief · updated 8:47am</div>
           </div>
         </div>
-        <p style={{ margin: "13px 2px 2px", fontSize: 17, fontWeight: 700, lineHeight: 1.32, color: "#fff", letterSpacing: "-.01em", textWrap: "pretty" }}>
-          <span style={{ color: "rgba(255,255,255,.9)", fontWeight: 900 }}>{decisions.length} critical {decisions.length === 1 ? "item" : "items"}</span> for today
+        <p style={{ margin: "13px 2px 2px", fontSize: 17, fontWeight: 700, lineHeight: 1.32, color: "var(--content-heavy)", letterSpacing: "-.01em", textWrap: "pretty" }}>
+          <span style={{ color: "var(--sky-ink)" }}>{decisions.length} critical {decisions.length === 1 ? "item" : "items"}</span> for today
         </p>
       </div>
 

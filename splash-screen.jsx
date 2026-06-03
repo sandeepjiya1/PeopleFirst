@@ -1,13 +1,37 @@
-/* global React */
+/* global React, lottie */
 
-// ── 1 · SPLASH — brand screen (provided asset, inlined), full-bleed ──
+// ── 1 · SPLASH — Lottie animation (PeopleFirst - Splash - v2.json) ──
 function SplashScreen() {
-  const src = typeof window !== "undefined" && window.__SPLASH_IMG ? window.__SPLASH_IMG : "assets/splash.png";
-  return (
-    <div style={{ position: "absolute", inset: 0, background: "#1672a8", overflow: "hidden", animation: "fadeIn .25s ease" }}>
-      <img src={src} alt="PeopleFirst" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block", animation: "splashRise .6s var(--motion-easing-enter)" }} />
-    </div>);
+  const containerRef = React.useRef(null);
 
+  React.useEffect(() => {
+    if (!containerRef.current) return;
+    // Use lottie-web if available, else fall back to static image
+    if (typeof lottie !== "undefined") {
+      const anim = lottie.loadAnimation({
+        container: containerRef.current,
+        renderer: "svg",
+        loop: false,
+        autoplay: true,
+        path: "assets/splash-v2.json",
+      });
+      return () => anim.destroy();
+    }
+  }, []);
+
+  return (
+    <div style={{
+      position: "absolute", inset: 0, overflow: "hidden",
+      background: "#0f2980",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      animation: "fadeIn .2s ease"
+    }}>
+      <div
+        ref={containerRef}
+        style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}
+      />
+    </div>
+  );
 }
 
 // ── Skeleton primitives ──
