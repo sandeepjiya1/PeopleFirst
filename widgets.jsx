@@ -433,17 +433,26 @@ function News({ onOpen, onWish }) {
   const [showCeleb, setShowCeleb] = React.useState(false);
   const sectionRef = React.useRef(null);
 
+  const expandTimer = React.useRef(null);
+
   React.useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
     const obs = new IntersectionObserver(([e]) => {
+      clearTimeout(expandTimer.current);
       if (e.isIntersecting) {
-        setTimeout(() => setExpanded(true), 280);
-        obs.disconnect();
+        // Entering viewport — delay slightly so user sees the stacked state first
+        expandTimer.current = setTimeout(() => setExpanded(true), 220);
+      } else {
+        // Leaving viewport — collapse immediately so animation is visible on scroll back
+        setExpanded(false);
       }
-    }, { threshold: 0.3 });
+    }, {
+      threshold: [0.15, 0.4],   // fire at 15% (collapse trigger) and 40% (expand trigger)
+      rootMargin: "0px 0px -60px 0px"  // trigger a little before the bottom edge
+    });
     obs.observe(el);
-    return () => obs.disconnect();
+    return () => { obs.disconnect(); clearTimeout(expandTimer.current); };
   }, []);
 
   const items = [
@@ -487,7 +496,9 @@ function News({ onOpen, onWish }) {
           border: "1px solid var(--stroke-minimal)",
           opacity: expanded ? 0 : 1,
           transform: `scaleX(${expanded ? 0.9 : 1})`,
-          transition: "opacity .3s ease, transform .4s ease",
+          transition: expanded
+            ? "opacity .25s ease 0ms, transform .35s ease 0ms"
+            : "opacity .35s ease 280ms, transform .4s ease 280ms",
           pointerEvents: "none", zIndex: 1
         }} />
 
@@ -499,7 +510,9 @@ function News({ onOpen, onWish }) {
           boxShadow: "0 1px 4px rgba(15,23,42,.06)",
           opacity: expanded ? 0 : 1,
           transform: `scaleX(${expanded ? 0.95 : 1})`,
-          transition: "opacity .3s ease .05s, transform .4s ease",
+          transition: expanded
+            ? "opacity .25s ease 0ms, transform .35s ease 0ms"
+            : "opacity .35s ease 200ms, transform .4s ease 200ms",
           pointerEvents: "none", zIndex: 2
         }} />
 
@@ -516,34 +529,42 @@ function News({ onOpen, onWish }) {
           {/* Item 1 — always visible */}
           <NewsRow n={items[0]} divider={false} />
 
-          {/* Item 2 — expands on scroll */}
+          {/* Item 2 — expands on scroll-in, collapses on scroll-out */}
           <div style={{
             display: "grid",
             gridTemplateRows: expanded ? "1fr" : "0fr",
-            transition: "grid-template-rows .5s cubic-bezier(.4,0,.2,1) 0ms",
+            transition: expanded
+              ? "grid-template-rows .48s cubic-bezier(.4,0,.2,1) 0ms"
+              : "grid-template-rows .38s cubic-bezier(.4,0,1,1) 60ms",
           }}>
             <div style={{ minHeight: 0 }}>
               <div style={{
                 opacity: expanded ? 1 : 0,
-                transform: expanded ? "translateY(0)" : "translateY(-6px)",
-                transition: "opacity .4s ease 150ms, transform .45s cubic-bezier(.4,0,.2,1) 100ms",
+                transform: expanded ? "translateY(0)" : "translateY(-8px)",
+                transition: expanded
+                  ? "opacity .38s ease 160ms, transform .42s cubic-bezier(.4,0,.2,1) 110ms"
+                  : "opacity .25s ease 0ms, transform .3s ease 0ms",
               }}>
                 <NewsRow n={items[1]} divider={true} />
               </div>
             </div>
           </div>
 
-          {/* Celebrations row — expands after item 2 */}
+          {/* Celebrations row — expands after item 2, collapses first */}
           <div style={{
             display: "grid",
             gridTemplateRows: expanded ? "1fr" : "0fr",
-            transition: "grid-template-rows .5s cubic-bezier(.4,0,.2,1) 70ms",
+            transition: expanded
+              ? "grid-template-rows .48s cubic-bezier(.4,0,.2,1) 80ms"
+              : "grid-template-rows .38s cubic-bezier(.4,0,1,1) 0ms",
           }}>
             <div style={{ minHeight: 0 }}>
               <div style={{
                 opacity: expanded ? 1 : 0,
-                transform: expanded ? "translateY(0)" : "translateY(-6px)",
-                transition: "opacity .4s ease 230ms, transform .45s cubic-bezier(.4,0,.2,1) 180ms",
+                transform: expanded ? "translateY(0)" : "translateY(-8px)",
+                transition: expanded
+                  ? "opacity .38s ease 250ms, transform .42s cubic-bezier(.4,0,.2,1) 200ms"
+                  : "opacity .22s ease 0ms, transform .28s ease 0ms",
               }}>
                 <button onClick={() => setShowCeleb((v) => !v)} style={{ width: "100%", display: "flex", gap: 11, padding: "14px 14px", borderTop: "1px solid var(--stroke-minimal)", background: "none", border: "none", borderTopWidth: 1, borderTopStyle: "solid", borderTopColor: "var(--stroke-minimal)", cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}>
                   <span style={{ width: 8, height: 8, borderRadius: 999, background: "var(--sky)", flexShrink: 0, marginTop: 5 }} />
