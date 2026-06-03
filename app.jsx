@@ -174,8 +174,8 @@ function App() {
   // Boot sequence: splash → skeleton → ready
   const [phase, setPhase] = useState("splash");
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase("skeleton"), 1800);
-    const t2 = setTimeout(() => setPhase("ready"), 3300);
+    const t1 = setTimeout(() => setPhase("skeleton"), 4100);  // match Lottie duration (4s @ 60fps)
+    const t2 = setTimeout(() => setPhase("ready"), 5400);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
