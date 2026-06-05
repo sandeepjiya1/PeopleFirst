@@ -394,6 +394,173 @@ function Performance({ onOpen }) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// 2b · CRITICAL PROJECTS (Summary + Cards variant)
+//      Top: compact stats strip · Bottom: business-focused project cards
+// ═══════════════════════════════════════════════════════════════
+function CriticalProjectsCards({ onOpen }) {
+  const summary = { total: 74, onTime: 47, delayed: 19, onHold: 8 };
+
+  // Enriched project data — what a leader actually needs
+  const PROJECTS = [
+    {
+      name: "MyJio App",
+      status: "critical",   // critical / delayed / at_risk
+      owner: "Platform · Karan Mehta",
+      progress: 56, target: 95,
+      trend: -12,
+      dueIn: "Due Jul 15",
+      urgency: "high",
+      blocker: "3 sprints behind on payments rewrite",
+      action: "Move 1 engineer from Growth — recovers date"
+    },
+    {
+      name: "MyJio 3.1 revamp",
+      status: "delayed",
+      owner: "Design · Priya Sharma",
+      progress: 76, target: 90,
+      trend: -8,
+      dueIn: "Due Aug 1",
+      urgency: "medium",
+      blocker: "On-time delivery slipped 10pts since Feb",
+      action: "Reduce team workload — currently at 113%"
+    },
+    {
+      name: "Jio Translate",
+      status: "delayed",
+      owner: "ML · Arjun Nair",
+      progress: 58, target: 85,
+      trend: -5,
+      dueIn: "Due Jun 30",
+      urgency: "high",
+      blocker: "Scope creep in ML pipeline module",
+      action: "Freeze new feature requests until Q3"
+    },
+    {
+      name: "JioFiber B2B",
+      status: "at_risk",
+      owner: "Sales · Meena Joshi",
+      progress: 82, target: 90,
+      trend: -3,
+      dueIn: "Due Jul 20",
+      urgency: "low",
+      blocker: "Legal sign-off pending for enterprise contracts",
+      action: "Escalate to legal — 3 deals blocked"
+    }
+  ];
+
+  const statusColor = (s) => s === "critical" ? "var(--negative)" : s === "delayed" ? "#FB923C" : "var(--warning)";
+  const statusBg   = (s) => s === "critical" ? "var(--negative-light)" : s === "delayed" ? "#FFF0E5" : "var(--warning-light)";
+  const statusLabel = (s) => s === "critical" ? "Critical" : s === "delayed" ? "Delayed" : "At risk";
+  const urgencyColor = { high: "var(--negative)", medium: "#FB923C", low: "var(--warning)" };
+
+  const scrollRef = React.useRef(null);
+
+  return (
+    <Widget icon="analytics" title="Critical projects" action="See all" onAction={onOpen}>
+
+      {/* ── Top: Compact summary strip ── */}
+      <div style={{
+        background: "var(--surface-minimal)",
+        borderRadius: 14,
+        border: "1px solid var(--stroke-minimal)",
+        boxShadow: "0 1px 4px rgba(15,23,42,.05)",
+        padding: "14px 16px",
+        marginBottom: 10
+      }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--content-minimal)", textTransform: "uppercase", letterSpacing: ".04em" }}>Total projects</div>
+            <div style={{ fontSize: 32, fontWeight: 900, color: "var(--content-heavy)", letterSpacing: "-.04em", lineHeight: 1, marginTop: 3, fontVariantNumeric: "tabular-nums" }}>{summary.total}</div>
+          </div>
+          <div style={{ display: "flex", gap: 16 }}>
+            {[
+              { label: "On time", val: summary.onTime, color: "var(--positive)" },
+              { label: "Delayed", val: summary.delayed, color: "var(--negative)" },
+              { label: "On hold", val: summary.onHold, color: "var(--content-minimal)" }
+            ].map(s => (
+              <div key={s.label} style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 20, fontWeight: 900, color: s.color, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em", lineHeight: 1 }}>{s.val}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: "var(--content-minimal)", marginTop: 3 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Segmented progress bar */}
+        <div style={{ display: "flex", height: 6, borderRadius: 999, overflow: "hidden", gap: 2, marginTop: 12 }}>
+          <div style={{ flex: summary.onTime, background: "var(--positive)" }} />
+          <div style={{ flex: summary.delayed, background: "var(--negative)" }} />
+          <div style={{ flex: summary.onHold, background: "#CBD5E1" }} />
+        </div>
+      </div>
+
+      {/* ── Bottom: Horizontal project cards ── */}
+      <div ref={scrollRef}
+        style={{ display: "flex", gap: 10, overflowX: "auto", padding: "2px 0 4px", WebkitOverflowScrolling: "touch" }}>
+
+        {PROJECTS.map((p) => (
+          <div key={p.name} style={{
+            flex: "0 0 228px", flexShrink: 0,
+            background: "var(--surface-minimal)",
+            borderRadius: 14,
+            border: "1px solid var(--stroke-minimal)",
+            boxShadow: "0 2px 10px rgba(15,23,42,.07)",
+            padding: "14px",
+            display: "flex", flexDirection: "column", gap: 10
+          }}>
+
+            {/* Row 1: name + status */}
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "var(--content-heavy)", letterSpacing: "-.01em", lineHeight: 1.2 }}>{p.name}</div>
+                <div style={{ fontSize: 11, color: "var(--content-minimal)", fontWeight: 500, marginTop: 2 }}>{p.owner}</div>
+              </div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: statusColor(p.status), background: statusBg(p.status), borderRadius: 999, padding: "3px 8px", whiteSpace: "nowrap", flexShrink: 0 }}>{statusLabel(p.status)}</span>
+            </div>
+
+            {/* Row 2: Big % + trend + due date */}
+            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+                <span style={{ fontSize: 34, fontWeight: 900, letterSpacing: "-.04em", color: "var(--content-heavy)", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{p.progress}%</span>
+                <Trend dir="down" good={false}>{p.trend} pts</Trend>
+              </div>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: urgencyColor[p.urgency], display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ width: 6, height: 6, borderRadius: 999, background: urgencyColor[p.urgency], flexShrink: 0 }} />
+                {p.dueIn}
+              </span>
+            </div>
+
+            {/* Row 3: Progress bar vs target */}
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--content-minimal)" }}>Progress</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "var(--content-moderate)" }}>Target {p.target}%</span>
+              </div>
+              <div style={{ height: 7, borderRadius: 999, background: "var(--surface-subtle)", overflow: "hidden", position: "relative" }}>
+                {/* Target marker */}
+                <div style={{ position: "absolute", left: `${p.target}%`, top: 0, bottom: 0, width: 2, background: "var(--stroke-heavy)", zIndex: 1 }} />
+                {/* Progress fill */}
+                <div style={{ height: "100%", width: `${p.progress}%`, borderRadius: 999, background: statusColor(p.status) }} />
+              </div>
+            </div>
+
+            {/* Row 4: Blocker + Action — what leader needs */}
+            <div style={{ background: "var(--sky-light)", borderRadius: 10, padding: "9px 10px" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 5 }}>
+                <span style={{ fontSize: 11, fontWeight: 800, color: "var(--negative)", textTransform: "uppercase", letterSpacing: ".03em", flexShrink: 0 }}>⚑</span>
+                <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--content-heavy)", lineHeight: 1.35 }}>{p.blocker}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 6 }}>
+                <Icon name="ai_sparkle" size={12} color="var(--sky)" style={{ marginTop: 1, flexShrink: 0 }} />
+                <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--sky-ink)", lineHeight: 1.35 }}>{p.action}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Widget>);
+}
+
+// ═══════════════════════════════════════════════════════════════
 // 3 · ACTION ITEMS — approvals, with AI bulk-approve
 // ═══════════════════════════════════════════════════════════════
 function ActionItems({ state, onBulkApprove, onOpen }) {
@@ -566,12 +733,12 @@ function useTeamsData(onOpen) {
   let acc = 0;
   const arcs = segs.map(s => { const len=(s.value/total)*halfCirc; const a={...s,len:Math.max(len-GAP,4),offset:acc}; acc+=len; return a; });
   const avatars = ["https://i.pravatar.cc/40?img=11","https://i.pravatar.cc/40?img=25","https://i.pravatar.cc/40?img=32","https://i.pravatar.cc/40?img=47","https://i.pravatar.cc/40?img=53"];
-  return { total, present, leave, notIn, woph, vTotal, stats, arcs, fullCirc, halfCirc, cx, cy, avatars };
+  return { total, present, leave, notIn, woph, vTotal, stats, arcs, fullCirc, halfCirc, cx, cy, r, avatars };
 }
 
 // ── View A: Gauge + 2×2 grid ──
 function TeamsGauge({ onOpen }) {
-  const { total, present, vTotal, stats, arcs, fullCirc, halfCirc, cx, cy } = useTeamsData(onOpen);
+  const { total, present, vTotal, stats, arcs, fullCirc, halfCirc, cx, cy, r } = useTeamsData(onOpen);
   const StatRow = () => (
     <div style={{ display: "flex", borderTop: "1px solid var(--stroke-minimal)" }}>
       {stats.map((s, i) => (
@@ -1017,7 +1184,7 @@ function ExpenseBudget({ onOpen }) {
 }
 
 Object.assign(window, {
-  AIBriefing, Performance, ExpenseBudget, ExpenseBudgetBars, ActionItems, TeamSnapshot, Teams, TeamsGauge, TeamsHeadcount, Recruitment, Bookings, News
+  AIBriefing, Performance, CriticalProjectsCards, ExpenseBudget, ExpenseBudgetBars, ActionItems, TeamSnapshot, Teams, TeamsGauge, TeamsHeadcount, Recruitment, Bookings, News
 });
 
 // ═══════════════════════════════════════════════════════════════

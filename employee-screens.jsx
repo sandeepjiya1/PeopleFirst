@@ -314,7 +314,13 @@ function MoreScreen({ onBack, persona, onSwitch, onRow, wCfg = {}, updateWCfg, w
 
   // Leader widgets list — items with `children` are expandable
   const leaderWidgets = [
-    { key: "projects",    icon: "analytics", label: "Critical Projects",  desc: "Carousel with AI insights" },
+    {
+      key: "projects_group", icon: "analytics", label: "Critical Projects", desc: "Project pipeline overview",
+      children: [
+        { key: "projects_carousel", label: "Carousel view",       desc: "Sticky summary + swipeable cards", def: true },
+        { key: "projects_cards",    label: "Summary + Cards",     desc: "Stats strip + business-focused cards", def: false },
+      ]
+    },
     { key: "expense",     icon: "card",      label: "Expense & Budget",   desc: "Category bars + pie chart" },
     { key: "approvals",   icon: "confirm",   label: "Approvals",          desc: "Pending approval queue" },
     {

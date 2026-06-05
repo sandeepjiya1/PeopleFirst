@@ -270,7 +270,8 @@ function App() {
         <Header name="Vikram" initials="VM" onBell={() => setAssistant(true)} onSearch={() => setSearch(true)} onProfile={() => go("more")} badge={headerBadge} />
         <div style={{ padding: "20px 16px 28px", display: "flex", flexDirection: "column", gap }}>
           <AIBriefing expanded={expanded} onToggle={() => setExpanded((x) => !x)} decisions={decisions} onResolve={resolveDecision} onOpenAssistant={() => setAssistant(true)} />
-          {wOn("projects") && <Performance onOpen={() => go("reports")} />}
+          {wOn("projects_carousel", true) && <Performance onOpen={() => go("reports")} />}
+          {wOn("projects_cards", false) && <CriticalProjectsCards onOpen={() => go("reports")} />}
           {wOn("expense") && <ExpenseBudgetBars onOpen={() => go("reports")} />}
           {wOn("approvals") && <ActionItems state={approve} onBulkApprove={bulkApprove} onOpen={(f) => { setApprFilter(f || "All"); go("approvals"); }} />}
           {wOn("teams_gauge", true) && <TeamsGauge onOpen={(f) => { go("team"); if (f) flash(`Filtering team: ${f.replace("_", " ")}`); }} />}
@@ -371,4 +372,26 @@ function App() {
 
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+// Global error boundary — prevents blank screen on any unhandled render error
+class AppErrorBoundary extends React.Component {
+  constructor(p) { super(p); this.state = { crashed: false, error: "" }; }
+  static getDerivedStateFromError(e) { return { crashed: true, error: e.message }; }
+  componentDidCatch(e) { console.error("[PeopleFirst] render error:", e.message); }
+  render() {
+    if (this.state.crashed) {
+      // Reload automatically after 2s so a transient error doesn't leave user stuck
+      setTimeout(() => { this.setState({ crashed: false, error: "" }); }, 2000);
+      return (
+        <div style={{ position: "fixed", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "var(--surface-subtle, #F1F5F9)", gap: 12 }}>
+          <div style={{ fontSize: 40 }}>🔄</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#475569" }}>Refreshing…</div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  React.createElement(AppErrorBoundary, null, React.createElement(App))
+);
